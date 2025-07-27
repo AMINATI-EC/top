@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会社概要 - AMINATI_EC</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; 
+            background-color: #ffffff; 
+            color: #000000; 
+            line-height: 1.6;
+        }
+        header {
+            background: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            text-decoration: none;
+            color: #000000;
+        }
+        .nav-link {
+            text-decoration: none;
+            color: #666666;
+            font-size: 14px;
+        }
+        main {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+        h1 {
+            font-size: 32px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        .company-table {
+            width: 100%;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+        }
+        .company-table tr {
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .company-table tr:last-child {
+            border-bottom: none;
+        }
+        .company-table th {
+            background: #f8f8f8;
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #666666;
+            width: 30%;
+        }
+        .company-table td {
+            padding: 20px;
+            color: #000000;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 40px;
+            padding: 12px 30px;
+            background: #000000;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .back-button:hover {
+            background: #333333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo">AMINATI_EC</a>
+            <a href="index.html" class="nav-link">← トップに戻る</a>
+        </div>
+    </header>
+    
+    <main>
+        <h1>会社概要</h1>
+        
+        <table class="company-table">
+            <tr>
+                <th>会社名</th>
+                <td>株式会社AMINATI</td>
+            </tr>
+            <tr>
+                <th>代表者</th>
+                <td>代表取締役 南谷</td>
+            </tr>
+            <tr>
+                <th>設立</th>
+                <td>2024年1月</td>
+            </tr>
+            <tr>
+                <th>資本金</th>
+                <td>1,000万円</td>
+            </tr>
+            <tr>
+                <th>事業内容</th>
+                <td>アパレル製品の企画・製造・販売</td>
+            </tr>
+            <tr>
+                <th>所在地</th>
+                <td>〒100-0001 東京都千代田区千代田1-1-1</td>
+            </tr>
+            <tr>
+                <th>TEL</th>
+                <td>03-XXXX-XXXX</td>
+            </tr>
+            <tr>
+                <th>FAX</th>
+                <td>03-XXXX-XXXX</td>
+            </tr>
+            <tr>
+                <th>E-mail</th>
+                <td>order@aminati-ec.com</td>
+            </tr>
+            <tr>
+                <th>営業時間</th>
+                <td>平日 9:00-18:00</td>
+            </tr>
+        </table>
+        
+        <a href="index.html" class="back-button">トップページに戻る</a>
+    </main>
+</body>
+</html>
