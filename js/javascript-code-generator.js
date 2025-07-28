@@ -109,7 +109,7 @@ class JavaScriptCodeGenerator {
         // EmailNotificationService（Gmail SMTP本番版）
         class EmailNotificationService {
             constructor() {
-                this.apiUrl = 'http://localhost:8001/send-order-email';
+                this.apiUrl = 'https://script.google.com/macros/s/AKfycbx_sbEqPleCtBeTMkV2BwNbF4-5OVwh7AzmUNkg5Z2rX2p6yUcmcGT5Q-Lchi4yMvZB/exec';
                 this.healthUrl = 'http://localhost:8001/health';
                 this.testUrl = 'http://localhost:8001/test-email';
             }
