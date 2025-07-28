@@ -22,11 +22,7 @@ class EmailNotificationService {
                 adminEmail = 'aminati.ec@gmail.com';
             }
             
-            // Node.jsサーバーが起動しているかチェック
-            const healthCheck = await this.checkServerHealth();
-            if (!healthCheck.success) {
-                throw new Error('メールサーバーが起動していません。email-server.js を起動してください。');
-            }
+            
             
             // APIに送信するデータ形式に変換
             const emailData = this.formatEmailData(orderData, adminEmail);
