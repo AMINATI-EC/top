@@ -1,4 +1,109 @@
-// メール送信部分は分割版のコードを維持（動作確認済みのもの）
+// JavaScriptコード生成クラス
+class JavaScriptCodeGenerator {
+    constructor() {
+        // 必要に応じて初期化処理
+    }
+    
+    // 管理設定のJavaScriptコード
+    getAdminSettingsCode() {
+        return `
+        // AdminSettings グローバルオブジェクトの確認
+        if (typeof window.adminSettings === 'undefined') {
+            console.warn('AdminSettings が見つかりません。デフォルト設定を使用します。');
+        }
+        `;
+    }
+    
+    // 商品ページ用のスクリプト（本番用のコード構造に合わせる）
+    getProductScripts(product, images) {
+        return `
+        // メニューの開閉
+        const menuBtn = document.getElementById('menuBtn');
+        const slideMenu = document.getElementById('slideMenu');
+        const overlay = document.getElementById('overlay');
+
+        menuBtn.addEventListener('click', function() {
+            menuBtn.classList.toggle('active');
+            slideMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', function() {
+            menuBtn.classList.remove('active');
+            slideMenu.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+        
+        // メニュー項目の処理
+        const baseUrl = 'http://localhost:8000';
+        
+        function goToTopPage() {
+            window.location.href = baseUrl + '/index.html';
+        }
+        
+        function showAllProducts() {
+            window.location.href = baseUrl + '/index.html';
+        }
+        
+        function showNewProducts() {
+            window.location.href = baseUrl + '/index.html';
+        }
+        
+        function showCategories() {
+            window.location.href = baseUrl + '/index.html';
+        }
+        
+        function showAboutTrade() {
+            window.location.href = baseUrl + '/trade.html';
+        }
+        
+        function showCompanyInfo() {
+            window.location.href = baseUrl + '/company.html';
+        }
+        
+        function showContact() {
+            window.location.href = baseUrl + '/contact.html';
+        }
+        
+        // 画像切り替え
+        function changeImage(src, element) {
+            document.getElementById('mainImage').src = src;
+            document.querySelectorAll('.carousel-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+        
+        // オプション選択
+        document.querySelectorAll('.option-item').forEach(option => {
+            option.addEventListener('click', function() {
+                const siblings = this.parentElement.querySelectorAll('.option-item');
+                siblings.forEach(item => item.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // 商品データ
+        const currentProduct = {
+            productNumber: '${product.productNumber}',
+            productName: '${this.escapeForJavaScript(product.productName)}',
+            brandName: '${this.escapeForJavaScript(product.brandName || 'AMINATI COLLECTION')}',
+            price: ${product.salePrice},
+            originalPrice: ${product.originalPrice || product.salePrice},
+            material: '${this.escapeForJavaScript(product.material || '')}',
+            origin: '${this.escapeForJavaScript(product.origin || '')}',
+            colors: ${JSON.stringify(product.colors || [])},
+            sizes: ${JSON.stringify(product.sizes || [])},
+            thumbnail: '${images.thumbnail || ''}'
+        };
+        
+        // 数値フォーマット
+        function formatNumber(num) {
+            return num.toLocaleString('ja-JP');
+        }`;
+    }
+    
+    // メール送信部分は分割版のコードを維持（動作確認済みのもの）
     getPurchaseFlowScript() {
         return `
         // EmailNotificationService（Google Apps Script版）
@@ -590,3 +695,14 @@
             if (modal) modal.remove();
         }`;
     }
+    
+    // ヘルパーメソッド
+    escapeForJavaScript(text) {
+        return text
+            .replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\'")
+            .replace(/"/g, '\\"')
+            .replace(/\n/g, '\\n')
+            .replace(/\r/g, '\\r');
+    }
+}
