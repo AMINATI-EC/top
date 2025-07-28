@@ -17,14 +17,59 @@ function addLog(message, type = 'info') {
     }
 }
 
-// 商品番号の抽出
+// 商品番号の抽出（互換性を保つため既存の関数は変更しない）
 function extractProductNumber(filename) {
     // ファイル名から商品番号を抽出
     // 例: "21765-1(2).jpg" → "21765"
     // 例: "https://c.imgz.jp/004/21765-1(2).jpg" → "21765"
+    // 例: "21765-thumb.jpg" → "21765"
+    // 例: "21765-detail-1.jpg" → "21765"
     const basename = filename.split('/').pop().split('\\').pop();
     const match = basename.match(/(\d{4,})/);
     return match ? match[1] : null;
+}
+
+// ファイルタイプの判定関数（新規追加）
+function isThumbFile(filename) {
+    return filename.toLowerCase().includes('-thumb');
+}
+
+function isDetailFile(filename) {
+    return filename.toLowerCase().includes('-detail');
+}
+
+// 商品番号とファイルタイプの詳細抽出（新規追加）
+function extractProductInfo(filename) {
+    const basename = filename.split('/').pop().split('\\').pop();
+    const productNumber = extractProductNumber(filename);
+    
+    if (!productNumber) {
+        return null;
+    }
+    
+    // ファイルタイプを判定
+    let type = 'unknown';
+    if (isThumbFile(basename)) {
+        type = 'thumbnail';
+    } else if (isDetailFile(basename)) {
+        type = 'detail';
+    }
+    
+    // 詳細画像の場合、インデックス番号も抽出
+    let index = null;
+    if (type === 'detail') {
+        const indexMatch = basename.match(/-detail-?(\d+)/i);
+        if (indexMatch) {
+            index = parseInt(indexMatch[1], 10);
+        }
+    }
+    
+    return {
+        productNumber: productNumber,
+        type: type,
+        index: index,
+        originalFilename: basename
+    };
 }
 
 // ドラッグ&ドロップゾーンの設定

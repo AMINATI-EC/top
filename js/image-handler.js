@@ -28,6 +28,14 @@ class ImageHandler {
             return;
         }
         
+        // ファイルタイプの詳細情報を取得
+        const fileInfo = extractProductInfo(file.name);
+        
+        // 詳細画像形式のファイルがサムネイルドロップゾーンに入れられた場合の警告
+        if (fileInfo && fileInfo.type === 'detail') {
+            addLog(`⚠️ 詳細画像形式のファイル(${file.name})をサムネイルとして登録します`, 'warning');
+        }
+        
         // 既存のサムネイルがある場合は確認
         if (this.app.thumbnailImages[productNumber]) {
             if (!confirm(`商品番号 ${productNumber} のサムネイル画像を上書きしますか？`)) {
@@ -39,7 +47,8 @@ class ImageHandler {
             file: file,
             name: file.name,
             url: URL.createObjectURL(file),
-            isLocal: true
+            isLocal: true,
+            fileType: fileInfo ? fileInfo.type : 'unknown'
         };
         
         this.app.addThumbnailImage(productNumber, imageData);
@@ -54,16 +63,28 @@ class ImageHandler {
             return;
         }
         
+        // ファイルタイプの詳細情報を取得
+        const fileInfo = extractProductInfo(file.name);
+        
+        // サムネイル形式のファイルが詳細画像ドロップゾーンに入れられた場合の警告
+        if (fileInfo && fileInfo.type === 'thumbnail') {
+            addLog(`⚠️ サムネイル形式のファイル(${file.name})を詳細画像として登録します`, 'warning');
+        }
+        
         const imageData = {
             file: file,
             name: file.name,
             url: URL.createObjectURL(file),
-            isLocal: true
+            isLocal: true,
+            fileType: fileInfo ? fileInfo.type : 'unknown',
+            index: fileInfo ? fileInfo.index : null
         };
         
         const success = this.app.addDetailImage(productNumber, imageData);
         if (success) {
-            addLog(`詳細画像登録: ${file.name} → 商品番号 ${productNumber}`, 'success');
+            // 詳細画像のインデックス情報も含めてログ出力
+            const indexInfo = fileInfo && fileInfo.index ? ` (画像${fileInfo.index})` : '';
+            addLog(`詳細画像登録: ${file.name}${indexInfo} → 商品番号 ${productNumber}`, 'success');
         }
     }
     
@@ -130,5 +151,17 @@ class ImageHandler {
         }
         
         return true;
+    }
+    
+    // 詳細画像のソート（インデックス番号がある場合）
+    sortDetailImages(detailImages) {
+        return detailImages.sort((a, b) => {
+            // インデックス番号がある場合はそれでソート
+            if (a.index !== null && b.index !== null) {
+                return a.index - b.index;
+            }
+            // インデックス番号がない場合はファイル名でソート
+            return a.name.localeCompare(b.name);
+        });
     }
 }
