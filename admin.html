@@ -14,13 +14,21 @@
                 <span class="admin-badge">管理画面</span>
             </div>
             <div style="display: flex; align-items: center; gap: 15px;">
+                <button class="btn btn-primary" onclick="location.href='index.html'" style="padding: 8px 16px; font-size: 14px;">
+                    🏠 トップページを確認
+                </button>
+                <button class="btn btn-secondary" onclick="app.productGenerator.viewProducts()" style="padding: 8px 16px; font-size: 14px;">
+                    📋 商品管理
+                </button>
                 <button class="btn btn-secondary" onclick="adminSettings.showSettingsDialog()" style="padding: 8px 16px; font-size: 14px;">
                     ⚙️ 管理設定
                 </button>
                 <button class="btn btn-primary" onclick="location.href='admin-orders.html'" style="padding: 8px 16px; font-size: 14px;">
                     📦 注文管理
                 </button>
-                <span style="font-size: 14px; color: #666666;">商品一括登録システム v2.0</span>
+                <button class="btn btn-secondary" onclick="location.href='admin-manual.html'" style="padding: 8px 16px; font-size: 14px;">
+                    📖 使用説明書
+                </button>
             </div>
         </div>
     </header>
@@ -145,20 +153,30 @@
     <!-- 外部ライブラリ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
-    <!-- アプリケーションスクリプト -->
+    <!-- 基盤・設定系 (最初に読み込み) -->
     <script src="js/config.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/admin-settings.js"></script>
+
+    <!-- API・サービス系 -->
+    <script src="js/api-client.js"></script>
+    <script src="js/r2-uploader.js"></script>
+
+    <!-- データ処理系 -->
     <script src="js/excel-handler.js"></script>
     <script src="js/image-handler.js"></script>
     <script src="js/url-handler.js"></script>
-    <script src="js/api-client.js"></script>
-    <script src="js/r2-uploader.js"></script>
     <script src="js/product-storage.js"></script>
+
+    <!-- UI・生成系 (分割されたファイル群) -->
+    <script src="js/html-template-generator.js"></script>
+    <script src="js/javascript-code-generator.js"></script>
+    <script src="js/post-generation-manager.js"></script>
     <script src="js/product-generator.js"></script>
-    <script src="js/admin-settings.js"></script>
+    
+    <!-- UI管理・アプリ統合 (最後に読み込み) -->
     <script src="js/ui-manager.js"></script>
     <script src="js/app.js"></script>
-
 
 </body>
 </html>

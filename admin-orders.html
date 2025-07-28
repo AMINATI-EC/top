@@ -84,6 +84,26 @@
             font-size: 14px;
         }
         
+        /* アクションバー */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .selection-info {
+            font-size: 14px;
+            color: #666;
+        }
+        
         .orders-table {
             background: #ffffff;
             border-radius: 12px;
@@ -107,7 +127,6 @@
         .order-item {
             padding: 20px;
             border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
             transition: all 0.3s ease;
         }
         
@@ -121,19 +140,30 @@
         
         .order-row {
             display: grid;
-            grid-template-columns: 120px 1fr 150px 120px 100px 80px;
+            grid-template-columns: 40px 120px 1fr 150px 120px 100px 80px;
             gap: 15px;
             align-items: center;
+        }
+        
+        .checkbox-cell {
+            width: 40px;
+            text-align: center;
+        }
+        
+        .order-checkbox {
+            cursor: pointer;
         }
         
         .order-id {
             font-family: monospace;
             font-weight: 600;
             color: #2196f3;
+            cursor: pointer;
         }
         
         .order-product {
             min-width: 0;
+            cursor: pointer;
         }
         
         .product-name {
@@ -383,7 +413,6 @@
     <main class="orders-container">
         <div class="page-header">
             <h1 class="page-title">注文管理</h1>
-            <button class="btn btn-primary" onclick="refreshOrders()">🔄 更新</button>
         </div>
 
         <!-- 統計カード -->
@@ -437,8 +466,18 @@
 
         <!-- 注文一覧 -->
         <div class="orders-table">
-            <div class="table-header">
-                注文一覧
+            <div class="action-bar">
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="selectAll()">
+                        <span id="selectAllText">全選択</span>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteSelected()">
+                        選択を削除
+                    </button>
+                </div>
+                <div class="selection-info">
+                    <span id="selectedCount">0</span>件選択中
+                </div>
             </div>
             <div class="orders-list" id="ordersList">
                 <!-- 注文一覧がここに表示されます -->
@@ -450,6 +489,7 @@
         // グローバル変数
         let allOrders = [];
         let filteredOrders = [];
+        let selectedOrders = new Set();
 
         // ページ読み込み時の初期化
         document.addEventListener('DOMContentLoaded', function() {
@@ -515,10 +555,13 @@
             }
             
             ordersList.innerHTML = filteredOrders.map(order => `
-                <div class="order-item" onclick="showOrderDetail('${order.orderId}')">
+                <div class="order-item">
                     <div class="order-row">
-                        <div class="order-id">${order.orderId}</div>
-                        <div class="order-product">
+                        <div class="checkbox-cell">
+                            <input type="checkbox" class="order-checkbox" data-order-id="${order.orderId}" onchange="toggleOrderSelection('${order.orderId}')">
+                        </div>
+                        <div class="order-id" onclick="showOrderDetail('${order.orderId}')">${order.orderId}</div>
+                        <div class="order-product" onclick="showOrderDetail('${order.orderId}')">
                             <div class="product-name">${order.product.productName}</div>
                             <div class="product-details">
                                 ${order.product.selectedColor} / ${order.product.selectedSize}
@@ -540,6 +583,86 @@
                     </div>
                 </div>
             `).join('');
+            
+            // チェックボックスの状態を復元
+            selectedOrders.forEach(orderId => {
+                const checkbox = document.querySelector(`input[data-order-id="${orderId}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+            
+            updateSelectionInfo();
+        }
+
+        // 注文の選択状態を切り替え
+        function toggleOrderSelection(orderId) {
+            if (selectedOrders.has(orderId)) {
+                selectedOrders.delete(orderId);
+            } else {
+                selectedOrders.add(orderId);
+            }
+            updateSelectionInfo();
+        }
+
+        // 全選択/解除
+        function selectAll() {
+            const checkboxes = document.querySelectorAll('.order-checkbox');
+            const allSelected = selectedOrders.size === filteredOrders.length;
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = !allSelected;
+                const orderId = checkbox.dataset.orderId;
+                if (!allSelected) {
+                    selectedOrders.add(orderId);
+                } else {
+                    selectedOrders.delete(orderId);
+                }
+            });
+            
+            updateSelectionInfo();
+        }
+
+        // 選択状態の更新
+        function updateSelectionInfo() {
+            document.getElementById('selectedCount').textContent = selectedOrders.size;
+            document.getElementById('selectAllText').textContent = 
+                selectedOrders.size === filteredOrders.length && filteredOrders.length > 0 ? '全解除' : '全選択';
+        }
+
+        // 選択した注文を削除
+        async function deleteSelected() {
+            if (selectedOrders.size === 0) {
+                alert('削除する注文を選択してください');
+                return;
+            }
+            
+            const confirmMessage = `選択した${selectedOrders.size}件の注文を削除しますか？\n\n⚠️ 警告：\n・削除した注文は復元できません\n・お客様への連絡が必要な場合があります`;
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            const request = indexedDB.open('AminatiECOrders', 1);
+            
+            request.onsuccess = function(event) {
+                const db = event.target.result;
+                const transaction = db.transaction(['orders'], 'readwrite');
+                const objectStore = transaction.objectStore('orders');
+                
+                let deleteCount = 0;
+                const totalToDelete = selectedOrders.size;
+                
+                selectedOrders.forEach(orderId => {
+                    const deleteRequest = objectStore.delete(orderId);
+                    deleteRequest.onsuccess = () => {
+                        deleteCount++;
+                        if (deleteCount === totalToDelete) {
+                            selectedOrders.clear();
+                            loadOrders();
+                            alert(`${deleteCount}件の注文を削除しました`);
+                        }
+                    };
+                });
+            };
         }
 
         // ステータステキストの取得

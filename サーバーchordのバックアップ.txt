@@ -1,0 +1,432 @@
+export default {
+  async fetch(request, env, ctx) {
+    // CORS設定
+    const corsHeaders = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400',
+    };
+
+    // OPTIONSリクエストの処理（CORS プリフライト）
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { 
+        status: 204,
+        headers: corsHeaders 
+      });
+    }
+
+    const url = new URL(request.url);
+    const path = url.pathname;
+
+    try {
+      // ルーティング
+      if (path === '/' && request.method === 'GET') {
+        // ヘルスチェック
+        return new Response(JSON.stringify({ 
+          status: 'ok',
+          message: 'Image Upload API with Email Service is running!',
+          timestamp: new Date().toISOString(),
+          features: ['image-upload', 'email-notification']
+        }), {
+          status: 200,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json',
+          },
+        });
+      }
+
+      if (path === '/health' && request.method === 'GET') {
+        // 別のヘルスチェックエンドポイント
+        return new Response(JSON.stringify({ 
+          status: 'ok',
+          service: 'ec-image-uploader',
+          version: '2.0.0',
+          email_service: env.RESEND_API_KEY ? 'configured' : 'not_configured'
+        }), {
+          status: 200,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json',
+          },
+        });
+      }
+
+      if (path === '/upload' && request.method === 'POST') {
+        // 画像アップロード処理
+        return await handleUpload(request, env, corsHeaders);
+      }
+
+      // 新機能：メール送信テスト
+      if (path === '/test-email' && request.method === 'GET') {
+        return await sendTestEmail(env, corsHeaders);
+      }
+
+      // 新機能：注文確認メール送信
+      if (path === '/send-order-email' && request.method === 'POST') {
+        return await sendOrderEmail(request, env, corsHeaders);
+      }
+
+      // 404 Not Found
+      return new Response(JSON.stringify({ 
+        error: 'Not Found',
+        path: path,
+        method: request.method,
+        available_endpoints: [
+          'GET /',
+          'GET /health', 
+          'POST /upload',
+          'GET /test-email',
+          'POST /send-order-email'
+        ]
+      }), { 
+        status: 404,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        }
+      });
+
+    } catch (error) {
+      console.error('Worker error:', error);
+      return new Response(JSON.stringify({ 
+        error: 'Internal Server Error',
+        message: error.message 
+      }), {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+      });
+    }
+  },
+};
+
+// 画像アップロード処理（既存機能）
+async function handleUpload(request, env, corsHeaders) {
+  try {
+    // R2バインディングの確認
+    if (!env.EC_IMAGES) {
+      console.log('R2 binding EC_IMAGES is not configured');
+      return new Response(JSON.stringify({ 
+        error: 'R2 binding EC_IMAGES is not configured',
+        hint: 'Please add R2 bucket binding in Worker settings'
+      }), {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+      });
+    }
+
+    // FormDataを解析
+    const formData = await request.formData();
+    const file = formData.get('file');
+    const path = formData.get('path');
+    const sendNotification = formData.get('sendNotification'); // メール通知オプション
+
+    // バリデーション
+    if (!file) {
+      return new Response(JSON.stringify({ 
+        error: 'Missing file in request' 
+      }), {
+        status: 400,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+      });
+    }
+
+    if (!path) {
+      return new Response(JSON.stringify({ 
+        error: 'Missing path in request' 
+      }), {
+        status: 400,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+      });
+    }
+
+    // ファイルタイプの確認
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      return new Response(JSON.stringify({ 
+        error: 'Invalid file type',
+        type: file.type,
+        allowed: allowedTypes
+      }), {
+        status: 400,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+      });
+    }
+
+    // ファイルサイズの確認（10MB制限）
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      return new Response(JSON.stringify({ 
+        error: 'File too large',
+        size: file.size,
+        maxSize: maxSize
+      }), {
+        status: 400,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+      });
+    }
+
+    // ファイルをArrayBufferとして読み込む
+    const arrayBuffer = await file.arrayBuffer();
+    
+    // R2にアップロード
+    await env.EC_IMAGES.put(path, arrayBuffer, {
+      httpMetadata: {
+        contentType: file.type,
+        cacheControl: 'public, max-age=31536000', // 1年間キャッシュ
+      },
+      customMetadata: {
+        originalName: file.name,
+        uploadedAt: new Date().toISOString(),
+        size: file.size.toString(),
+      }
+    });
+
+    const imageUrl = `https://pub-a2319224352d4abda31362be3c2b1c19.r2.dev/${path}`;
+    
+    // 画像アップロード完了後、オプションでメール通知
+    let emailResult = null;
+    if (sendNotification === 'true' && env.RESEND_API_KEY) {
+      try {
+        emailResult = await sendImageUploadNotification(env, {
+          imagePath: path,
+          imageUrl: imageUrl,
+          fileName: file.name,
+          fileSize: file.size
+        });
+      } catch (emailError) {
+        console.error('Email notification failed:', emailError);
+        // メール失敗してもアップロードは成功として扱う
+      }
+    }
+
+    // 成功レスポンス
+    return new Response(JSON.stringify({ 
+      success: true,
+      message: 'Image uploaded successfully',
+      data: {
+        path: path,
+        size: file.size,
+        type: file.type,
+        name: file.name,
+        url: imageUrl
+      },
+      email: emailResult
+    }), {
+      status: 200,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
+    });
+
+  } catch (error) {
+    console.error('Upload error:', error);
+    return new Response(JSON.stringify({ 
+      error: 'Upload failed',
+      message: error.message 
+    }), {
+      status: 500,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+}
+
+// テストメール送信（新機能）
+async function sendTestEmail(env, corsHeaders) {
+  if (!env.RESEND_API_KEY) {
+    return new Response(JSON.stringify({
+      error: 'RESEND_API_KEY is not configured',
+      hint: 'Please add RESEND_API_KEY in Worker environment variables'
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  try {
+    const emailData = {
+      from: 'onboarding@resend.dev',
+      to: ['archiver0922@gmail.com'],
+      subject: '🎉 テストメール - Cloudflare Worker',
+      html: `
+        <h2>🎉 メール送信テスト成功！</h2>
+        <p>Cloudflare Worker + Resend APIでメール送信ができています。</p>
+        <p><strong>送信時刻:</strong> ${new Date().toLocaleString('ja-JP')}</p>
+        <hr>
+        <p>ECショップの注文確認メールの準備ができました！</p>
+        <p>画像アップロード機能と連携したメール通知も可能です。</p>
+      `
+    };
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(emailData),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      return new Response(JSON.stringify({
+        success: true,
+        message: 'テストメール送信成功！',
+        emailId: result.id
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    } else {
+      throw new Error(result.message || 'メール送信失敗');
+    }
+
+  } catch (error) {
+    return new Response(JSON.stringify({
+      success: false,
+      error: error.message
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+// 注文確認メール送信（新機能）
+async function sendOrderEmail(request, env, corsHeaders) {
+  if (!env.RESEND_API_KEY) {
+    return new Response(JSON.stringify({
+      error: 'RESEND_API_KEY is not configured'
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  try {
+    const orderData = await request.json();
+    const { customerEmail, orderId, items, total } = orderData;
+
+    if (!customerEmail || !orderId) {
+      return new Response(JSON.stringify({
+        error: 'Missing required fields: customerEmail, orderId'
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const itemsHtml = items ? items.map(item => 
+      `<li>${item.name} - ¥${item.price} × ${item.quantity}</li>`
+    ).join('') : '<li>商品情報なし</li>';
+
+    const emailData = {
+      from: 'onboarding@resend.dev', // 本番では orders@yourshop.com など
+      to: [customerEmail],
+      subject: `ご注文確認 - 注文番号: ${orderId}`,
+      html: `
+        <h2>🛍️ ご注文ありがとうございます！</h2>
+        <p><strong>注文番号:</strong> ${orderId}</p>
+        <p><strong>注文日時:</strong> ${new Date().toLocaleString('ja-JP')}</p>
+        
+        <h3>ご注文内容:</h3>
+        <ul>${itemsHtml}</ul>
+        
+        ${total ? `<p><strong>合計金額:</strong> ¥${total}</p>` : ''}
+        
+        <hr>
+        <p>商品の発送準備ができ次第、改めてご連絡いたします。</p>
+        <p>ご不明な点がございましたら、お気軽にお問い合わせください。</p>
+      `
+    };
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(emailData),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      return new Response(JSON.stringify({
+        success: true,
+        message: 'Order confirmation email sent successfully',
+        emailId: result.id,
+        orderId: orderId
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    } else {
+      throw new Error(result.message || 'Failed to send order email');
+    }
+
+  } catch (error) {
+    return new Response(JSON.stringify({
+      success: false,
+      error: error.message
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+// 画像アップロード通知メール送信
+async function sendImageUploadNotification(env, imageInfo) {
+  const emailData = {
+    from: 'onboarding@resend.dev',
+    to: ['archiver0922@gmail.com'], // 管理者アドレス
+    subject: '📷 新しい画像がアップロードされました',
+    html: `
+      <h2>📷 画像アップロード通知</h2>
+      <p><strong>ファイル名:</strong> ${imageInfo.fileName}</p>
+      <p><strong>アップロード先:</strong> ${imageInfo.imagePath}</p>
+      <p><strong>ファイルサイズ:</strong> ${(imageInfo.fileSize / 1024).toFixed(2)} KB</p>
+      <p><strong>アップロード時刻:</strong> ${new Date().toLocaleString('ja-JP')}</p>
+      
+      <p><strong>画像URL:</strong></p>
+      <p><a href="${imageInfo.imageUrl}">${imageInfo.imageUrl}</a></p>
+      
+      <img src="${imageInfo.imageUrl}" alt="アップロードされた画像" style="max-width: 300px; max-height: 300px;">
+    `
+  };
+
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(emailData),
+  });
+
+  const result = await response.json();
+  return response.ok ? result : null;
+}

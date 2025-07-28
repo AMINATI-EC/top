@@ -1,0 +1,35 @@
+AIzaSyDuLxskrLJoQxTQMHKc1cCc-tWWCSfE6AU
+
+https://ec-image-uploader-v2.pages.dev
+
+
+【店舗名】
+AMINATI_EC （アミナティ）
+【店舗TOP　URL】
+https://aminati-ec.github.io/top/
+
+【困ったときに使うパスワード】
+zozo20250725@
+
+【サーバー】
+https://dash.cloudflare.com/sign-up/r2
+
+
+【画像サーバーのAPI情報】
+アクセス キー ID
+016edad8d98f07ad63d2496fa598910a
+クリックしてコピー
+
+シークレット アクセス キー
+873f37fbf751f5c157e7a861d70f6af683fa2d37bccfa5bbc25cb4ab3551d9c6
+クリックしてコピー
+
+
+あなたの親URL（パブリック開発 URL）は：
+https://pub-a2319224352d4abda31362be3c2b1c19.r2.dev
+これがあなたのバケットの公開URLです！
+使い方の例：
+
+画像をアップロードした場合
+ファイルパス：products/image1.jpg
+完全なURL：https://pub-a2319224352d4abda31362be3c2b1c19.r2.dev/products/image1.jpg
