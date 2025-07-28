@@ -1,122 +1,15 @@
-// JavaScriptコード生成クラス
-class JavaScriptCodeGenerator {
-    constructor() {
-        // 必要に応じて初期化処理
-    }
-    
-    // 管理設定のJavaScriptコード
-    getAdminSettingsCode() {
-        return `
-        // AdminSettings グローバルオブジェクトの確認
-        if (typeof window.adminSettings === 'undefined') {
-            console.warn('AdminSettings が見つかりません。デフォルト設定を使用します。');
-        }
-        `;
-    }
-    
-    // 商品ページ用のスクリプト（本番用のコード構造に合わせる）
-    getProductScripts(product, images) {
-        return `
-        // メニューの開閉
-        const menuBtn = document.getElementById('menuBtn');
-        const slideMenu = document.getElementById('slideMenu');
-        const overlay = document.getElementById('overlay');
-
-        menuBtn.addEventListener('click', function() {
-            menuBtn.classList.toggle('active');
-            slideMenu.classList.toggle('active');
-            overlay.classList.toggle('active');
-        });
-
-        overlay.addEventListener('click', function() {
-            menuBtn.classList.remove('active');
-            slideMenu.classList.remove('active');
-            overlay.classList.remove('active');
-        });
-        
-        // メニュー項目の処理
-        const baseUrl = 'http://localhost:8000';
-        
-        function goToTopPage() {
-            window.location.href = baseUrl + '/index.html';
-        }
-        
-        function showAllProducts() {
-            window.location.href = baseUrl + '/index.html';
-        }
-        
-        function showNewProducts() {
-            window.location.href = baseUrl + '/index.html';
-        }
-        
-        function showCategories() {
-            window.location.href = baseUrl + '/index.html';
-        }
-        
-        function showAboutTrade() {
-            window.location.href = baseUrl + '/trade.html';
-        }
-        
-        function showCompanyInfo() {
-            window.location.href = baseUrl + '/company.html';
-        }
-        
-        function showContact() {
-            window.location.href = baseUrl + '/contact.html';
-        }
-        
-        // 画像切り替え
-        function changeImage(src, element) {
-            document.getElementById('mainImage').src = src;
-            document.querySelectorAll('.carousel-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            element.classList.add('active');
-        }
-        
-        // オプション選択
-        document.querySelectorAll('.option-item').forEach(option => {
-            option.addEventListener('click', function() {
-                const siblings = this.parentElement.querySelectorAll('.option-item');
-                siblings.forEach(item => item.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-        
-        // 商品データ
-        const currentProduct = {
-            productNumber: '${product.productNumber}',
-            productName: '${this.escapeForJavaScript(product.productName)}',
-            brandName: '${this.escapeForJavaScript(product.brandName || 'AMINATI COLLECTION')}',
-            price: ${product.salePrice},
-            originalPrice: ${product.originalPrice || product.salePrice},
-            material: '${this.escapeForJavaScript(product.material || '')}',
-            origin: '${this.escapeForJavaScript(product.origin || '')}',
-            colors: ${JSON.stringify(product.colors || [])},
-            sizes: ${JSON.stringify(product.sizes || [])},
-            thumbnail: '${images.thumbnail || ''}'
-        };
-        
-        // 数値フォーマット
-        function formatNumber(num) {
-            return num.toLocaleString('ja-JP');
-        }`;
-    }
-    
-    // メール送信部分は分割版のコードを維持（動作確認済みのもの）
+// メール送信部分は分割版のコードを維持（動作確認済みのもの）
     getPurchaseFlowScript() {
         return `
-        // EmailNotificationService（Gmail SMTP本番版）
+        // EmailNotificationService（Google Apps Script版）
         class EmailNotificationService {
             constructor() {
                 this.apiUrl = 'https://script.google.com/macros/s/AKfycbx_sbEqPleCtBeTMkV2BwNbF4-5OVwh7AzmUNkg5Z2rX2p6yUcmcGT5Q-Lchi4yMvZB/exec';
-                this.healthUrl = 'http://localhost:8001/health';
-                this.testUrl = 'http://localhost:8001/test-email';
             }
             
             async sendOrderNotification(orderData) {
                 try {
-                    console.log('📧 Gmail メール送信開始...', orderData);
+                    console.log('📧 メール送信開始...', orderData);
                     
                     // Admin設定からメールアドレスを取得
                     let adminEmail = this.getAdminEmail();
@@ -127,66 +20,31 @@ class JavaScriptCodeGenerator {
                         adminEmail = 'aminati.ec@gmail.com';
                     }
                     
-                    // Node.jsサーバーが起動しているかチェック
-                    const healthCheck = await this.checkServerHealth();
-                    if (!healthCheck.success) {
-                        throw new Error('メールサーバーが起動していません。email-server.js を起動してください。');
-                    }
-                    
                     // APIに送信するデータ形式に変換
                     const emailData = this.formatEmailData(orderData, adminEmail);
                     
-                    console.log('🌐 メールサーバー呼び出し:', this.apiUrl);
+                    console.log('🌐 GAS呼び出し:', this.apiUrl);
                     console.log('📝 送信データ:', emailData);
                     
-                    // Node.js Gmail サーバーを呼び出し
+                    // Google Apps Script を呼び出し
                     const response = await fetch(this.apiUrl, {
                         method: 'POST',
+                        mode: 'no-cors', // CORS回避
                         headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(emailData)
                     });
                     
-                    console.log('📊 レスポンス状態:', response.status, response.statusText);
+                    // no-corsモードではresponseの中身が見えないため、成功と仮定
+                    console.log('✅ GAS呼び出し完了（no-corsモード）');
                     
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        console.error('❌ メールサーバーエラーレスポンス:', errorText);
-                        throw new Error(\`HTTP \${response.status}: \${errorText}\`);
-                    }
-                    
-                    const result = await response.json();
-                    console.log('✅ Gmail メール送信成功:', result);
-                    
-                    this.showEmailSuccess(orderData, result);
-                    return { success: true, result };
+                    this.showEmailSuccess(orderData, adminEmail);
+                    return { success: true };
                     
                 } catch (error) {
-                    console.error('❌ Gmail メール送信エラー:', error);
+                    console.error('❌ メール送信エラー:', error);
                     this.showEmailFallback(orderData, error);
-                    return { success: false, error: error.message };
-                }
-            }
-            
-            // サーバーヘルスチェック
-            async checkServerHealth() {
-                try {
-                    const response = await fetch(this.healthUrl, {
-                        method: 'GET',
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    
-                    if (response.ok) {
-                        const result = await response.json();
-                        console.log('✅ メールサーバー正常:', result);
-                        return { success: true, result };
-                    } else {
-                        return { success: false, error: \`サーバーエラー: \${response.status}\` };
-                    }
-                } catch (error) {
-                    console.error('❌ サーバーヘルスチェック失敗:', error);
                     return { success: false, error: error.message };
                 }
             }
@@ -244,45 +102,29 @@ class JavaScriptCodeGenerator {
                 };
             }
             
-            showEmailSuccess(orderData, serverResult) {
-                const results = serverResult.results || [];
-                const adminResult = results.find(r => r.type === 'admin');
-                const customerResult = results.find(r => r.type === 'customer');
+            showEmailSuccess(orderData, adminEmail) {
+                const customerEmail = orderData.customer.email;
                 
                 const successHtml = \`
                     <div class="modal-overlay" id="emailSuccessModal">
                         <div class="modal-content">
                             <div class="success-icon">✅</div>
-                            <h2>Gmail メール送信完了</h2>
+                            <h2>メール送信リクエスト完了</h2>
                             
                             <div class="success-content">
-                                <p><strong>以下にメールを送信しました：</strong></p>
+                                <p><strong>以下のアドレスにメールを送信しています：</strong></p>
                                 <div class="email-sent-list">
-                                    \${adminResult && adminResult.success ? \`
                                     <div class="email-sent-item success">
                                         <span class="email-icon">✅</span>
-                                        <span>管理者: \${adminResult.to}</span>
-                                        <small>ID: \${adminResult.messageId}</small>
+                                        <span>管理者: \${adminEmail}</span>
                                     </div>
-                                    \` : \`
-                                    <div class="email-sent-item error">
-                                        <span class="email-icon">❌</span>
-                                        <span>管理者: 送信失敗</span>
-                                    </div>
-                                    \`}
                                     
-                                    \${customerResult ? (customerResult.success ? \`
+                                    \${customerEmail && customerEmail.trim() !== '' ? \`
                                     <div class="email-sent-item success">
                                         <span class="email-icon">📧</span>
-                                        <span>お客様: \${customerResult.to}</span>
-                                        <small>ID: \${customerResult.messageId}</small>
+                                        <span>お客様: \${customerEmail}</span>
                                     </div>
                                     \` : \`
-                                    <div class="email-sent-item error">
-                                        <span class="email-icon">❌</span>
-                                        <span>お客様: \${customerResult.to} (送信失敗)</span>
-                                    </div>
-                                    \`) : \`
                                     <div class="email-sent-item skip">
                                         <span class="email-icon">⚪</span>
                                         <span>お客様: メールアドレス未入力のためスキップ</span>
@@ -291,9 +133,8 @@ class JavaScriptCodeGenerator {
                                 </div>
                                 
                                 <div class="success-note">
-                                    <p>📨 Gmail SMTP経由で送信されました</p>
-                                    <p>🔔 店舗とお客様に注文通知が届きます</p>
-                                    <p>💌 送信完了: \${serverResult.message}</p>
+                                    <p>📨 Google Apps Script経由で送信処理中</p>
+                                    <p>🔔 まもなくメールが届きます</p>
                                 </div>
                             </div>
                             
@@ -355,8 +196,6 @@ class JavaScriptCodeGenerator {
                         gap: 10px;
                         margin-bottom: 12px;
                         font-size: 14px;
-                        flex-direction: column;
-                        align-items: flex-start;
                     }
                     .email-sent-item:last-child {
                         margin-bottom: 0;
@@ -364,16 +203,8 @@ class JavaScriptCodeGenerator {
                     .email-sent-item.success {
                         color: #28a745;
                     }
-                    .email-sent-item.error {
-                        color: #dc3545;
-                    }
                     .email-sent-item.skip {
                         color: #6c757d;
-                    }
-                    .email-sent-item small {
-                        font-size: 11px;
-                        color: #666;
-                        margin-left: 20px;
                     }
                     .email-icon {
                         font-size: 16px;
@@ -417,38 +248,24 @@ class JavaScriptCodeGenerator {
             }
             
             showEmailFallback(orderData, error) {
-                const isServerError = error.message.includes('メールサーバーが起動していません');
-                
                 const fallbackHtml = \`
                     <div class="modal-overlay" id="emailFallbackModal">
                         <div class="modal-content">
-                            <div class="error-icon">❌</div>
-                            <h2>メール送信エラー</h2>
+                            <div class="error-icon">⚠️</div>
+                            <h2>メール送信について</h2>
                             
                             <div class="error-content">
-                                <p><strong>自動メール送信に失敗しました</strong></p>
+                                <p><strong>メール送信処理中にエラーが発生した可能性があります</strong></p>
                                 
                                 <div class="error-details">
-                                    <p><strong>エラー内容:</strong></p>
+                                    <p><strong>詳細:</strong></p>
                                     <code>\${error.message}</code>
                                 </div>
-                                
-                                \${isServerError ? \`
-                                <div class="server-help">
-                                    <h4>📋 解決方法:</h4>
-                                    <ol>
-                                        <li>コマンドプロンプトを開く</li>
-                                        <li>プロジェクトフォルダに移動</li>
-                                        <li><code>cd C:\\Users\\archi\\Desktop\\hp\\js</code></li>
-                                        <li><code>npm start</code> を実行</li>
-                                        <li>メールサーバーが起動したら再度お試しください</li>
-                                    </ol>
-                                </div>
-                                \` : ''}
                                 
                                 <div class="fallback-note">
                                     <p>📝 注文データは正常に保存されています</p>
                                     <p>🏪 管理画面で注文を確認してください</p>
+                                    <p>📧 メールは遅れて届く可能性があります</p>
                                 </div>
                             </div>
                             
@@ -462,7 +279,7 @@ class JavaScriptCodeGenerator {
                     .error-icon {
                         width: 60px;
                         height: 60px;
-                        background: #dc3545;
+                        background: #ffc107;
                         color: white;
                         border-radius: 50%;
                         display: flex;
@@ -476,8 +293,8 @@ class JavaScriptCodeGenerator {
                         margin: 20px 0;
                     }
                     .error-details {
-                        background: #f8d7da;
-                        border: 1px solid #f5c6cb;
+                        background: #fff3cd;
+                        border: 1px solid #ffeaa7;
                         border-radius: 8px;
                         padding: 15px;
                         margin: 15px 0;
@@ -490,29 +307,9 @@ class JavaScriptCodeGenerator {
                         font-family: monospace;
                         font-size: 12px;
                     }
-                    .server-help {
+                    .fallback-note {
                         background: #d1ecf1;
                         border: 1px solid #bee5eb;
-                        border-radius: 8px;
-                        padding: 15px;
-                        margin: 15px 0;
-                        text-align: left;
-                    }
-                    .server-help h4 {
-                        margin-bottom: 10px;
-                    }
-                    .server-help ol {
-                        margin-left: 20px;
-                    }
-                    .server-help code {
-                        background: #fff;
-                        padding: 2px 4px;
-                        border-radius: 3px;
-                        font-family: monospace;
-                    }
-                    .fallback-note {
-                        background: #fff3cd;
-                        border: 1px solid #ffeaa7;
                         border-radius: 8px;
                         padding: 15px;
                         margin: 15px 0;
@@ -521,7 +318,7 @@ class JavaScriptCodeGenerator {
                         margin-bottom: 8px;
                         font-size: 14px;
                         line-height: 1.4;
-                        color: #856404;
+                        color: #004085;
                     }
                     </style>
                 \`;
@@ -944,7 +741,7 @@ class JavaScriptCodeGenerator {
                 const objectStore = transaction.objectStore('orders');
                 
                 objectStore.add(orderData).onsuccess = () => {
-                    // Gmail通知送信
+                    // メール通知送信
                     sendOrderNotification(orderData);
                     
                     showOrderComplete(orderData);
@@ -1025,14 +822,3 @@ class JavaScriptCodeGenerator {
             if (modal) modal.remove();
         }`;
     }
-    
-    // ヘルパーメソッド
-    escapeForJavaScript(text) {
-        return text
-            .replace(/\\/g, '\\\\')
-            .replace(/'/g, "\\'")
-            .replace(/"/g, '\\"')
-            .replace(/\n/g, '\\n')
-            .replace(/\r/g, '\\r');
-    }
-}
