@@ -109,7 +109,7 @@ class JavaScriptCodeGenerator {
         // EmailNotificationService（Google Apps Script版）
         class EmailNotificationService {
             constructor() {
-                this.apiUrl = 'https://script.google.com/macros/s/AKfycbx_sbEqPleCtBeTMkV2BwNbF4-5OVwh7AzmUNkg5Z2rX2p6yUcmcGT5Q-Lchi4yMvZB/exec';
+                this.apiUrl = 'https://script.google.com/macros/s/AKfycbw8XWKX56Kioxp0xJH2Vc5qiWDv-Y-XlIQzQ5LkJCbDoEEoIwx_-92gHFjj3MHFnQvO/exec';
             }
             
             async sendOrderNotification(orderData) {
