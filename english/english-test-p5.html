@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英語テスト復習 - Page 5</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+            background: #f0f0f0;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .page-layout {
+            display: flex;
+            max-width: 100%;
+        }
+        
+        .side-nav {
+            width: 80px;
+            background: #333;
+            min-height: 100vh;
+            padding: 20px 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            display: block;
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            background: #555;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .nav-item:hover {
+            background: #666;
+            transform: translateX(5px);
+        }
+        
+        .nav-item.active {
+            background: #ff6b35;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        }
+        
+        .main-content {
+            margin-left: 80px;
+            flex: 1;
+        }
+        
+        .container {
+            max-width: 1194px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header .page-info {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        
+        .question-card {
+            background: white;
+            border-radius: 0;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .question-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            background: #ff6b35;
+        }
+        
+        .question-header {
+            background: #333;
+            color: white;
+            padding: 15px 20px 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .question-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            background: white;
+            color: #333;
+        }
+        
+        .status-badge.incorrect {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .question-content {
+            padding: 20px 25px;
+        }
+        
+        .question-text {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+        
+        .answer-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 0 25px 15px 25px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        .answer-box {
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .answer-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .answer-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .your-answer {
+            background: #fff;
+            border: 2px solid #ddd;
+        }
+        
+        .your-answer.incorrect .answer-value {
+            color: #dc3545;
+        }
+        
+        .correct-answer {
+            background: #fff;
+            border: 2px solid #333;
+        }
+        
+        .correct-answer .answer-value {
+            color: #333;
+        }
+        
+        .explanation {
+            background: #fff9e6;
+            border-left: 4px solid #ff6b35;
+            padding: 15px;
+            margin: 0 25px 20px 25px;
+            border-radius: 5px;
+        }
+        
+        .explanation-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff6b35;
+            margin-bottom: 10px;
+        }
+        
+        .explanation-content {
+            font-size: 15px;
+            color: #333;
+            line-height: 1.8;
+        }
+        
+        .grammar-point {
+            background: #f0f7ff;
+            border: 1px solid #ff6b35;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        
+        .grammar-title {
+            font-weight: bold;
+            color: #ff6b35;
+            margin-bottom: 5px;
+        }
+        
+        .grammar-content {
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .options-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .option-item {
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .option-item.selected {
+            background: #ffe6e6;
+            border: 2px solid #dc3545;
+        }
+        
+        .option-item.correct-choice {
+            background: #fff;
+            border: 2px solid #333;
+            font-weight: bold;
+        }
+        
+        .reference-note {
+            background: #f9f9f9;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-layout">
+        <nav class="side-nav">
+            <a href="english-test-p1.html" class="nav-item">P1</a>
+            <a href="english-test-p2.html" class="nav-item">P2</a>
+            <a href="english-test-p3.html" class="nav-item">P3</a>
+            <a href="english-test-p4.html" class="nav-item">P4</a>
+            <a href="english-test-p5.html" class="nav-item active">P5</a>
+            <a href="english-test-p6.html" class="nav-item">P6</a>
+            <a href="english-test-p7.html" class="nav-item">P7</a>
+            <a href="english-test-p8.html" class="nav-item">P8</a>
+        </nav>
+        
+        <div class="main-content">
+            <div class="container">
+                <div class="header">
+                    <h1>第1学年 後期中間試験【英語】復習</h1>
+                    <div class="page-info">元の問題集: p.5 (問題8 Saki & Carl 自然公園)</div>
+                </div>
+                
+                <div class="reference-note">
+                    <strong>問題8の背景:</strong> Saki、Carl、Saki's fatherが自然公園(Four Seasons Park)に行った時の物語です。<br>
+                    彼らは美しい青い花を見つけます。Sakiはその花を持ち帰りたいと思いますが、お父さんが「No」と言います。
+                </div>
+                
+                <!-- 問題8-1 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 8-(1)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> 文中の下線部(1)が意味することとして、もっとも適する語を、次の①〜④の中から1つ選び、番号で答えなさい。
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item">① a book</div>
+                            <div class="option-item">② a picture</div>
+                            <div class="option-item">③ Carl</div>
+                            <div class="option-item correct-choice">④ a flower</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">無回答</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">④</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">無回答でした!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は④ a flower でした。文脈から "it" が何を指しているか読み取る問題です。
+                            </p>
+                            <div class="grammar-point">
+                                <div class="grammar-title">📚 代名詞 "it" の理解</div>
+                                <div class="grammar-content">
+                                    <strong>it</strong> は直前に出てきた名詞を指します。<br>
+                                    この場合、SakiとCarlが見つけた青い花(a beautiful blue flower)を指しています。<br>
+                                    <br>
+                                    <strong>例:</strong><br>
+                                    "They find a flower. It is very beautiful."<br>
+                                    → "It" = "a flower"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題8-2 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 8-(2)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> Sakiの父親が、文中の下線部(2)のように言ったことの理由として、もっとも適切なものを、次の①〜④の中から1つ選び、番号で答えなさい。
+                        </div>
+                        <div class="question-text">
+                            <strong>下線部(2):</strong> "No." (Sakiが花を持ち帰りたいと言った時の父親の返答)
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item selected">① 自然公園の大切なきまりだから。</div>
+                            <div class="option-item">② 写真を撮ることが2人に注ついたから。</div>
+                            <div class="option-item">③ ごみが増えるから。</div>
+                            <div class="option-item correct-choice">④ その花には葉があるから。</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">①</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">④</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です。しっかり復習しましょう!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は④でした。父親が "No" と言った理由は、自然公園のルールに関係しています。<br>
+                            文章をよく読むと、自然公園では「写真は撮れる(You can take pictures)。足跡は残せる(You can leave your footprints)。でもゴミのようなもの(trash)は残してはいけない」という重要なルールがあります。
+                            </p>
+                            <div class="grammar-point">
+                                <div class="grammar-title">📚 自然公園のルール</div>
+                                <div class="grammar-content">
+                                    <strong>自然公園で許されること:</strong><br>
+                                    ・写真を撮ること (take pictures)<br>
+                                    ・足跡を残すこと (leave footprints)<br>
+                                    <br>
+                                    <strong>許されないこと:</strong><br>
+                                    ・ゴミのようなものを残すこと (don't leave anything like trash)<br>
+                                    <br>
+                                    <strong>重要な表現:</strong><br>
+                                    "It's a very important rule at nature parks."<br>
+                                    (自然公園のとても大切なルールです)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題8-3 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 8-(3)</div>
+                        <div class="status-badge">正解 ✓</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> 場面にふさわしい英文となるように、(3)にあてはまる英文を一文、考えて書きなさい。(記述問題)
+                        </div>
+                        <div class="question-text">
+                            《条件》<br>
+                            ① anythingを必ず用いること。<br>
+                            ② ①に示した語を含んで____内を3語または4語で書くこと。
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #28a745;">正解です!</strong>
+                            <p style="margin-top: 10px;">
+                            記述問題で正解できました。条件に従って正しい文を作成できています。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</body>
+</html>

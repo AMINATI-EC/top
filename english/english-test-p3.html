@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英語テスト復習 - Page 3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+            background: #f0f0f0;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .page-layout {
+            display: flex;
+            max-width: 100%;
+        }
+        
+        .side-nav {
+            width: 80px;
+            background: #333;
+            min-height: 100vh;
+            padding: 20px 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            display: block;
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            background: #555;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .nav-item:hover {
+            background: #666;
+            transform: translateX(5px);
+        }
+        
+        .nav-item.active {
+            background: #ff6b35;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        }
+        
+        .main-content {
+            margin-left: 80px;
+            flex: 1;
+        }
+        
+        .container {
+            max-width: 1194px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header .page-info {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        
+        .question-card {
+            background: white;
+            border-radius: 0;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .question-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            background: #ff6b35;
+        }
+        
+        .question-header {
+            background: #333;
+            color: white;
+            padding: 15px 20px 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .question-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            background: white;
+            color: #333;
+        }
+        
+        .status-badge.incorrect {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .question-content {
+            padding: 20px 25px;
+        }
+        
+        .question-text {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+        
+        .answer-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 0 25px 15px 25px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        .answer-box {
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .answer-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .answer-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .your-answer {
+            background: #fff;
+            border: 2px solid #ddd;
+        }
+        
+        .your-answer.incorrect .answer-value {
+            color: #dc3545;
+        }
+        
+        .correct-answer {
+            background: #fff;
+            border: 2px solid #333;
+        }
+        
+        .correct-answer .answer-value {
+            color: #333;
+        }
+        
+        .explanation {
+            background: #fff9e6;
+            border-left: 4px solid #ff6b35;
+            padding: 15px;
+            margin: 0 25px 20px 25px;
+            border-radius: 5px;
+        }
+        
+        .explanation-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff6b35;
+            margin-bottom: 10px;
+        }
+        
+        .explanation-content {
+            font-size: 15px;
+            color: #333;
+            line-height: 1.8;
+        }
+        
+        .grammar-point {
+            background: #f0f7ff;
+            border: 1px solid #ff6b35;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        
+        .grammar-title {
+            font-weight: bold;
+            color: #ff6b35;
+            margin-bottom: 5px;
+        }
+        
+        .grammar-content {
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .reference-note {
+            background: #f9f9f9;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-layout">
+        <nav class="side-nav">
+            <a href="english-test-p1.html" class="nav-item">P1</a>
+            <a href="english-test-p2.html" class="nav-item">P2</a>
+            <a href="english-test-p3.html" class="nav-item active">P3</a>
+            <a href="english-test-p4.html" class="nav-item">P4</a>
+            <a href="english-test-p5.html" class="nav-item">P5</a>
+            <a href="english-test-p6.html" class="nav-item">P6</a>
+            <a href="english-test-p7.html" class="nav-item">P7</a>
+            <a href="english-test-p8.html" class="nav-item">P8</a>
+        </nav>
+        
+        <div class="main-content">
+            <div class="container">
+                <div class="header">
+                    <h1>第1学年 後期中間試験【英語】復習</h1>
+                    <div class="page-info">元の問題集: p.3-4 (問題4-5 博物館)</div>
+                </div>
+                
+                <div class="reference-note">
+                    <strong>問題4-5の背景:</strong> 博物館(museum)についての長文問題です。<br>
+                    リスニングで聞いた内容や、文章を読んで答える問題が含まれています。
+                </div>
+                
+                <!-- 問題4 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 4</div>
+                        <div class="status-badge">正解 ✓</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題4:</strong> 記述問題 (12点満点)
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box">
+                            <div class="answer-label">得点</div>
+                            <div class="answer-value">12 / 12点</div>
+                        </div>
+                        <div class="answer-box">
+                            <div class="answer-label">評価</div>
+                            <div class="answer-value" style="color: #28a745;">満点!</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #28a745;">満点です!素晴らしい!</strong>
+                            <p style="margin-top: 10px;">
+                            記述問題で満点を取れました。英作文の力がしっかり身についています。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題5-3 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 5-(3)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> 博物館についての長文を読んで、内容に関する質問に答える問題
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">②</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">④</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です。しっかり復習しましょう!</strong>
+                            <p style="margin-top: 10px;">
+                            博物館に関する文章の内容理解問題です。文章全体をよく読んで、正しい内容を選ぶ必要があります。
+                            </p>
+                            <div class="grammar-point">
+                                <div class="grammar-title">📚 長文読解のコツ</div>
+                                <div class="grammar-content">
+                                    <strong>長文を読む時のポイント:</strong><br>
+                                    ・まず質問文を先に読んで、何を聞かれているか把握する<br>
+                                    ・本文を読みながら、キーワードに線を引く<br>
+                                    ・選択肢と本文を照らし合わせて、正誤を判断する<br>
+                                    <br>
+                                    <strong>よくある間違い:</strong><br>
+                                    ・本文に書いていない内容を想像で選んでしまう<br>
+                                    ・似た単語に惑わされて、間違った選択肢を選ぶ
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題5-4 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 5-(4)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> 博物館についての長文を読んで、内容に関する質問に答える問題
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">③</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">②</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です!</strong>
+                            <p style="margin-top: 10px;">
+                            長文の内容をしっかり理解できているか確認しましょう。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題5-6 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 5-(6)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> 博物館についての長文を読んで、内容に関する質問に答える問題
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">①</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">③</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です!</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題5-9 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 5-(9)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> 博物館についての長文を読んで、内容に関する質問に答える問題
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">④</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">②</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です!</strong>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</body>
+</html>

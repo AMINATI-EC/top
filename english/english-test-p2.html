@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英語テスト復習 - Page 2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+            background: #f0f0f0;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .page-layout {
+            display: flex;
+            max-width: 100%;
+        }
+        
+        .side-nav {
+            width: 80px;
+            background: #333;
+            min-height: 100vh;
+            padding: 20px 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            display: block;
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            background: #555;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .nav-item:hover {
+            background: #666;
+            transform: translateX(5px);
+        }
+        
+        .nav-item.active {
+            background: #4a90e2;
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+        }
+        
+        .main-content {
+            margin-left: 80px;
+            flex: 1;
+        }
+        
+        .container {
+            max-width: 1194px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4a90e2 0%, #5da3f0 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header .page-info {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        
+        .question-card {
+            background: white;
+            border-radius: 0;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .question-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            background: #4a90e2;
+        }
+        
+        .question-header {
+            background: #333;
+            color: white;
+            padding: 15px 20px 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .question-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            background: white;
+            color: #333;
+        }
+        
+        .status-badge.incorrect {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .question-content {
+            padding: 20px 25px;
+        }
+        
+        .question-text {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+        
+        .answer-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 0 25px 15px 25px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        .answer-box {
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .answer-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .answer-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .your-answer {
+            background: #fff;
+            border: 2px solid #ddd;
+        }
+        
+        .your-answer.incorrect .answer-value {
+            color: #dc3545;
+        }
+        
+        .correct-answer {
+            background: #fff;
+            border: 2px solid #333;
+        }
+        
+        .correct-answer .answer-value {
+            color: #333;
+        }
+        
+        .explanation {
+            background: #e6f2ff;
+            border-left: 4px solid #4a90e2;
+            padding: 15px;
+            margin: 0 25px 20px 25px;
+            border-radius: 5px;
+        }
+        
+        .explanation-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #4a90e2;
+            margin-bottom: 10px;
+        }
+        
+        .explanation-content {
+            font-size: 15px;
+            color: #333;
+            line-height: 1.8;
+        }
+        
+        .grammar-point {
+            background: #fff9e6;
+            border: 1px solid #4a90e2;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        
+        .grammar-title {
+            font-weight: bold;
+            color: #4a90e2;
+            margin-bottom: 5px;
+        }
+        
+        .grammar-content {
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .options-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .option-item {
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .option-item.selected {
+            background: #ffe6e6;
+            border: 2px solid #dc3545;
+        }
+        
+        .option-item.correct-choice {
+            background: #fff;
+            border: 2px solid #333;
+            font-weight: bold;
+        }
+        
+        .reference-note {
+            background: #f9f9f9;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-layout">
+        <nav class="side-nav">
+            <a href="english-test-p1.html" class="nav-item">P1</a>
+            <a href="english-test-p2.html" class="nav-item active">P2</a>
+            <a href="english-test-p3.html" class="nav-item">P3</a>
+            <a href="english-test-p4.html" class="nav-item">P4</a>
+            <a href="english-test-p5.html" class="nav-item">P5</a>
+            <a href="english-test-p6.html" class="nav-item">P6</a>
+            <a href="english-test-p7.html" class="nav-item">P7</a>
+            <a href="english-test-p8.html" class="nav-item">P8</a>
+        </nav>
+        
+        <div class="main-content">
+            <div class="container">
+                <div class="header">
+                    <h1>第1学年 後期中間試験【英語】復習</h1>
+                    <div class="page-info">元の問題集: p.2 (問題3 レストラン BURGER QUEEN)</div>
+                </div>
+                
+                <div class="reference-note">
+                    <strong>問題3の背景:</strong> Davidはハンバーガー店で食事をしました。その後に店員さんと話している内容です。
+                    <br><br>
+                    <strong>参考情報:</strong><br>
+                    • Set A (800円) = Burger + Drink<br>
+                    • Set B (1,000円) = Burger + Side + Drink<br>
+                    • Set C (1,200円) = Burger + Side + Drink + Dessert<br>
+                    • Side Menu: French Fries / Salad (各300円)<br>
+                    • Dessert Menu: Cheesecake / Chocolate Donut (各300円)
+                </div>
+                
+                <!-- 問題3-2 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 3-(2)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> Davidが食べ終わったのはどれですか。下のメニュー表を参考にして、次の①〜④の中から1つ選びなさい。
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item selected">① Set A</div>
+                            <div class="option-item">② Set B</div>
+                            <div class="option-item correct-choice">③ Set C</div>
+                            <div class="option-item">④ 単品のみ</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">①</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">③</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です。しっかり復習しましょう!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は③ Set C でした。<br>
+                            この問題は、会話やリスニングで「Davidが何を注文したか」を聞き取り、メニュー表と照らし合わせる問題です。
+                            </p>
+                            <div class="grammar-point">
+                                <div class="grammar-title">📚 セットメニューの理解</div>
+                                <div class="grammar-content">
+                                    <strong>メニュー表の確認:</strong><br>
+                                    ・Set A (800円) = Burger + Drink<br>
+                                    ・Set B (1,000円) = Burger + Side + Drink<br>
+                                    ・Set C (1,200円) = Burger + Side + Drink + Dessert<br>
+                                    <br>
+                                    <strong>リスニングのポイント:</strong><br>
+                                    ・何が含まれているか注意深く聞く<br>
+                                    ・dessert (デザート) という単語が聞こえたら Set C の可能性が高い<br>
+                                    ・cheesecake や chocolate donut などのデザート名が聞こえたら確実に Set C<br>
+                                    <br>
+                                    <strong>注文の英語表現:</strong><br>
+                                    "I'll have Set C, please." (セットCをください)<br>
+                                    "Can I get the set with dessert?" (デザート付きのセットをもらえますか)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題3-3 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 3-(3)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> 注文の合計金額はいくらですか。下のメニュー表を参考にして、次の①〜④の中から1つ選びなさい。
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item">① 1,000 yen</div>
+                            <div class="option-item selected">② 1,300 yen</div>
+                            <div class="option-item correct-choice">③ 1,500 yen</div>
+                            <div class="option-item">④ 1,600 yen</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">②</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">③</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です。しっかり復習しましょう!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は③ 1,500 yen でした。<br>
+                            この問題は、前の問題(3-2)で間違えた影響を受けている可能性があります。
+                            </p>
+                            <div class="grammar-point">
+                                <div class="grammar-title">📚 合計金額の計算</div>
+                                <div class="grammar-content">
+                                    <strong>計算の考え方:</strong><br>
+                                    前問の答えが Set C (1,200円) だったので、それだけでは1,200円です。<br>
+                                    合計が1,500円ということは、<strong>追加で300円分を注文した</strong>ことになります。<br>
+                                    <br>
+                                    <strong>可能性:</strong><br>
+                                    ・Side Menu (300円) を追加 → French Fries か Salad<br>
+                                    ・Dessert Menu (300円) を追加<br>
+                                    <br>
+                                    <strong>英語での表現:</strong><br>
+                                    "How much is the total?" (合計いくらですか?)<br>
+                                    "That'll be 1,500 yen." (1,500円になります)<br>
+                                    "Can I add French Fries?" (フレンチフライを追加できますか?)<br>
+                                    <br>
+                                    <strong>計算式:</strong><br>
+                                    Set C (1,200円) + Side Menu (300円) = 1,500円
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題3-4 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 3-(4)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> Davidが待つテーブルはどれですか。下のレストラン図の①〜⑧の中から最も適するものを1つ選びなさい。
+                        </div>
+                        <div class="reference-note">
+                            <strong>レストラン図の説明:</strong><br>
+                            • 2nd floor (2階): テーブル①②③④<br>
+                            • 1st floor (1階): テーブル⑤⑥⑦⑧<br>
+                            • 各階にはWC、kids room、窓、階段などがあります
+                        </div>
+                        <div class="question-text" style="margin-top: 10px;">
+                            <strong>選択肢:</strong><br>
+                            ① ②③④ (2階のテーブル)<br>
+                            ⑤⑥⑦⑧ (1階のテーブル)
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">④ (2階・右下)</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">⑧ (1階・右下)</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です。しっかり復習しましょう!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は⑧でした。④を選んでしまったということは、<strong>1st floor(1階)と2nd floor(2階)を間違えた</strong>可能性が高いです。
+                            </p>
+                            <div class="grammar-point">
+                                <div class="grammar-title">📚 場所・位置に関する英語表現</div>
+                                <div class="grammar-content">
+                                    <strong>階数の表現:</strong><br>
+                                    ・1st floor = 1階(イチカイ)<br>
+                                    ・2nd floor = 2階(ニカイ)<br>
+                                    ※アメリカ英語では1st floor = 日本の1階、イギリス英語では ground floor = 1階<br>
+                                    <br>
+                                    <strong>位置の表現:</strong><br>
+                                    ・next to the window = 窓の隣<br>
+                                    ・near the kitchen = キッチンの近く<br>
+                                    ・by the entrance = 入口のそば<br>
+                                    ・on the right/left = 右側/左側に<br>
+                                    <br>
+                                    <strong>よく使う表現:</strong><br>
+                                    "Table number 8 on the first floor, please."<br>
+                                    (1階の8番テーブルをお願いします)<br>
+                                    <br>
+                                    "It's near the kitchen." (キッチンの近くです)<br>
+                                    <br>
+                                    <strong>間違いやすいポイント:</strong><br>
+                                    ・レストラン図の1st floor は下側、2nd floor は上側<br>
+                                    ・⑧は1階の右下で、窓の近くかキッチンの近くにある<br>
+                                    ・④は2階の右下なので、階数を間違えた可能性大
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</body>
+</html>

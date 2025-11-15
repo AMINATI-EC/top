@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英語テスト復習 - Page 6</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+            background: #f0f0f0;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .page-layout {
+            display: flex;
+            max-width: 100%;
+        }
+        
+        .side-nav {
+            width: 80px;
+            background: #333;
+            min-height: 100vh;
+            padding: 20px 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            display: block;
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            background: #555;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .nav-item:hover {
+            background: #666;
+            transform: translateX(5px);
+        }
+        
+        .nav-item.active {
+            background: #4a90e2;
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+        }
+        
+        .main-content {
+            margin-left: 80px;
+            flex: 1;
+        }
+        
+        .container {
+            max-width: 1194px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4a90e2 0%, #5da3f0 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header .page-info {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        
+        .question-card {
+            background: white;
+            border-radius: 0;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .question-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            background: #4a90e2;
+        }
+        
+        .question-header {
+            background: #333;
+            color: white;
+            padding: 15px 20px 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .question-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            background: white;
+            color: #333;
+        }
+        
+        .status-badge.incorrect {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .question-content {
+            padding: 20px 25px;
+        }
+        
+        .question-text {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+        
+        .answer-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 0 25px 15px 25px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        .answer-box {
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .answer-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .answer-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .your-answer {
+            background: #fff;
+            border: 2px solid #ddd;
+        }
+        
+        .your-answer.incorrect .answer-value {
+            color: #dc3545;
+        }
+        
+        .correct-answer {
+            background: #fff;
+            border: 2px solid #333;
+        }
+        
+        .correct-answer .answer-value {
+            color: #333;
+        }
+        
+        .explanation {
+            background: #e6f2ff;
+            border-left: 4px solid #4a90e2;
+            padding: 15px;
+            margin: 0 25px 20px 25px;
+            border-radius: 5px;
+        }
+        
+        .explanation-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #4a90e2;
+            margin-bottom: 10px;
+        }
+        
+        .explanation-content {
+            font-size: 15px;
+            color: #333;
+            line-height: 1.8;
+        }
+        
+        .grammar-point {
+            background: #fff9e6;
+            border: 1px solid #4a90e2;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        
+        .grammar-title {
+            font-weight: bold;
+            color: #4a90e2;
+            margin-bottom: 5px;
+        }
+        
+        .grammar-content {
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .options-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .option-item {
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .option-item.selected {
+            background: #ffe6e6;
+            border: 2px solid #dc3545;
+        }
+        
+        .option-item.correct-choice {
+            background: #fff;
+            border: 2px solid #333;
+            font-weight: bold;
+        }
+        
+        .reference-note {
+            background: #f9f9f9;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-layout">
+        <nav class="side-nav">
+            <a href="english-test-p1.html" class="nav-item">P1</a>
+            <a href="english-test-p2.html" class="nav-item">P2</a>
+            <a href="english-test-p3.html" class="nav-item">P3</a>
+            <a href="english-test-p4.html" class="nav-item">P4</a>
+            <a href="english-test-p5.html" class="nav-item">P5</a>
+            <a href="english-test-p6.html" class="nav-item active">P6</a>
+            <a href="english-test-p7.html" class="nav-item">P7</a>
+            <a href="english-test-p8.html" class="nav-item">P8</a>
+        </nav>
+        
+        <div class="main-content">
+            <div class="container">
+                <div class="header">
+                    <h1>第1学年 後期中間試験【英語】復習</h1>
+                    <div class="page-info">元の問題集: p.6 (問題9 Mizuki & Dona 電話会話)</div>
+                </div>
+                
+                <div class="reference-note">
+                    <strong>問題9の背景:</strong> MizukiとDonaが電話で話しています。<br>
+                    待ち合わせ場所はKayama駅(カヤマ駅)ですが、Donaが電車に乗れなかったため(事故で電車が止まった)、新しい待ち合わせ場所を決めます。<br>
+                    Donaは現在Ichiba駅(イチバ駅)の近くにいます。
+                </div>
+                
+                <!-- 問題9-1 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 9-(1)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> 文中の下線部(1)が意味することとして、もっとも適するものを、次の①〜④の中から1つ選び、番号で答えなさい。
+                        </div>
+                        <div class="question-text">
+                            <strong>下線部(1):</strong> "there" (Donaが "I can't go there." と言った時の"there")
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item">① Donaの家</div>
+                            <div class="option-item selected">② カヤマ駅</div>
+                            <div class="option-item">③ イチバ駅</div>
+                            <div class="option-item correct-choice">④ Mizukiの学校</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">②</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">④</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です。しっかり復習しましょう!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は④ Mizukiの学校 でした。<br>
+                            会話の流れから、"there"が何を指しているかを読み取る必要があります。
+                            </p>
+                            <div class="grammar-point">
+                                <div class="grammar-title">📚 指示語の理解</div>
+                                <div class="grammar-content">
+                                    <strong>there</strong> = 「そこ」「そこへ」<br>
+                                    会話の文脈から、直前に話していた場所を指します。<br>
+                                    <br>
+                                    待ち合わせ場所の候補:<br>
+                                    ・their meeting point (最初の待ち合わせ場所)<br>
+                                    ・Kayama station (カヤマ駅)<br>
+                                    ・Mizuki's school (Mizukiの学校)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題9-2 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 9-(2)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> 文中の下線部(2)に対する答えとして、もっとも適するものを、次の①〜④の中から1つ選び、番号で答えなさい。
+                        </div>
+                        <div class="question-text">
+                            <strong>下線部(2):</strong> "why not?" (Mizukiが "Oh, why not?" と聞いた)
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item">① 電車に乗れないから。</div>
+                            <div class="option-item">② 待ち合わせ場所がどこかわからないから。</div>
+                            <div class="option-item correct-choice">③ バスターミナルが見つからないから。</div>
+                            <div class="option-item selected">④ 自分がどこにいるのかわからないから。</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">④</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">③</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は③ バスターミナルが見つからないから でした。<br>
+                            Donaは電車が止まってしまったため、バスターミナルを探しているが見つからないと言っています。
+                            </p>
+                            <div class="grammar-point">
+                                <div class="grammar-title">📚 "Why not?" の使い方</div>
+                                <div class="grammar-content">
+                                    <strong>Why not?</strong> = 「なぜダメなの?」「どうして?」<br>
+                                    相手が何かできない理由を聞く時に使います。<br>
+                                    <br>
+                                    <strong>例:</strong><br>
+                                    A: "I can't go there."<br>
+                                    B: "Why not?" (どうして行けないの?)<br>
+                                    A: "I can't find the bus terminal." (バスターミナルが見つからないんだ)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題9-3 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 9-(3)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> Donaは今、どこにいますか。本文の内容に合うもっとも適切なものを、次の①〜④の中から1つ選び、番号で答えなさい。
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item correct-choice">① Ichiba station</div>
+                            <div class="option-item">② Kayama station</div>
+                            <div class="option-item selected">③ their meeting point</div>
+                            <div class="option-item">④ Tsuta Hospital</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">③</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">①</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は① Ichiba station でした。<br>
+                            DonaはIchiba駅(イチバ駅)にいると会話の中で言っています。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題9-4 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 9-(4)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> 新しく決まった待ち合わせ場所はどこですか。本文の内容に合うもっとも適切なものを、次の①〜④の中から1つ選び、番号で答えなさい。
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item correct-choice">① カヤマ駅の裏の木の下</div>
+                            <div class="option-item selected">② イチバ駅の隣にある青と白の建物の正面</div>
+                            <div class="option-item">③ ツタ病院の前にある木の下</div>
+                            <div class="option-item">④ カヤマ駅の隣の駅の前にある建物の正面</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">②</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">①</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は① カヤマ駅の裏の木の下 でした。<br>
+                            最終的にMizukiとDonaが決めた新しい待ち合わせ場所は「Tsuta Hospital(ツタ病院)の前の大きな木の下」です。
+                            </p>
+                            <div class="grammar-point">
+                                <div class="grammar-title">📚 場所を説明する表現</div>
+                                <div class="grammar-content">
+                                    <strong>場所の説明:</strong><br>
+                                    ・under the big tree = 大きな木の下<br>
+                                    ・in front of 〜 = 〜の前に<br>
+                                    ・next to 〜 = 〜の隣に<br>
+                                    ・over the bus terminal = バスターミナルの向こう側に<br>
+                                    <br>
+                                    <strong>例:</strong><br>
+                                    "Let's meet under the big tree in front of Tsuta Hospital."<br>
+                                    (ツタ病院の前の大きな木の下で会いましょう)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題9-5 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 9-(5)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> 本文の内容に関連していることとして、もっとも適するものを、次の①〜④の中から1つ選び、番号で答えなさい。
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item selected">① カヤマ駅はイチバ駅の隣の駅である。</div>
+                            <div class="option-item">② イチバ駅はカヤマ駅から歩いて10分の距離にある。</div>
+                            <div class="option-item correct-choice">③ ツタ病院の前には、大きな木がある。</div>
+                            <div class="option-item">④ Donaからバスターミナルのむこうにツタ病院がある。</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">①</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">③</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は③ ツタ病院の前には、大きな木がある でした。<br>
+                            会話の中で「ツタ病院の前の大きな木の下で会おう」と決めているので、ツタ病院の前には大きな木があることがわかります。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</body>
+</html>

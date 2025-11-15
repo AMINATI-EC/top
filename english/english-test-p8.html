@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英語テスト復習 - Page 8</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+            background: #f0f0f0;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .page-layout {
+            display: flex;
+            max-width: 100%;
+        }
+        
+        .side-nav {
+            width: 80px;
+            background: #333;
+            min-height: 100vh;
+            padding: 20px 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            display: block;
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            background: #555;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .nav-item:hover {
+            background: #666;
+            transform: translateX(5px);
+        }
+        
+        .nav-item.active {
+            background: #4a90e2;
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+        }
+        
+        .main-content {
+            margin-left: 80px;
+            flex: 1;
+        }
+        
+        .container {
+            max-width: 1194px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4a90e2 0%, #5da3f0 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header .page-info {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        
+        .question-card {
+            background: white;
+            border-radius: 0;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .question-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            background: #4a90e2;
+        }
+        
+        .question-header {
+            background: #333;
+            color: white;
+            padding: 15px 20px 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .question-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            background: white;
+            color: #333;
+        }
+        
+        .status-badge.incorrect {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .question-content {
+            padding: 20px 25px;
+        }
+        
+        .question-text {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+        
+        .answer-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 0 25px 15px 25px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        .answer-box {
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .answer-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .answer-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .your-answer {
+            background: #fff;
+            border: 2px solid #ddd;
+        }
+        
+        .your-answer.incorrect .answer-value {
+            color: #dc3545;
+        }
+        
+        .correct-answer {
+            background: #fff;
+            border: 2px solid #333;
+        }
+        
+        .correct-answer .answer-value {
+            color: #333;
+        }
+        
+        .explanation {
+            background: #e6f2ff;
+            border-left: 4px solid #4a90e2;
+            padding: 15px;
+            margin: 0 25px 20px 25px;
+            border-radius: 5px;
+        }
+        
+        .explanation-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #4a90e2;
+            margin-bottom: 10px;
+        }
+        
+        .explanation-content {
+            font-size: 15px;
+            color: #333;
+            line-height: 1.8;
+        }
+        
+        .grammar-point {
+            background: #fff9e6;
+            border: 1px solid #4a90e2;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        
+        .grammar-title {
+            font-weight: bold;
+            color: #4a90e2;
+            margin-bottom: 5px;
+        }
+        
+        .grammar-content {
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .reference-note {
+            background: #f9f9f9;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+        
+        .options-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .option-item {
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .option-item.selected {
+            background: #ffe6e6;
+            border: 2px solid #dc3545;
+        }
+        
+        .option-item.correct-choice {
+            background: #fff;
+            border: 2px solid #333;
+            font-weight: bold;
+        }
+        
+        .menu-box {
+            background: white;
+            border: 3px solid #333;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .menu-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .menu-item {
+            font-size: 22px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        
+        .condition-box {
+            background: #fff9e6;
+            border: 2px solid #4a90e2;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .completion-message {
+            background: linear-gradient(135deg, #4a90e2 0%, #5da3f0 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .completion-message h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        .completion-message p {
+            font-size: 16px;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-layout">
+        <nav class="side-nav">
+            <a href="english-test-p1.html" class="nav-item">P1</a>
+            <a href="english-test-p2.html" class="nav-item">P2</a>
+            <a href="english-test-p3.html" class="nav-item">P3</a>
+            <a href="english-test-p4.html" class="nav-item">P4</a>
+            <a href="english-test-p5.html" class="nav-item">P5</a>
+            <a href="english-test-p6.html" class="nav-item">P6</a>
+            <a href="english-test-p7.html" class="nav-item">P7</a>
+            <a href="english-test-p8.html" class="nav-item active">P8</a>
+        </nav>
+        
+        <div class="main-content">
+            <div class="container">
+                <div class="header">
+                    <h1>第1学年 後期中間試験【英語】復習</h1>
+                    <div class="page-info">元の問題集: p.8 (問題10 Part 2 + 問題11)</div>
+                </div>
+                
+                <div class="reference-note">
+                    <strong>このページの内容:</strong><br>
+                    • 問題10-(2)の③④⑤<br>
+                    • 問題11(英作文)
+                </div>
+                
+                <!-- 問題10-2-3 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 10-(2)③</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> Naoが文中の下線部(3)のように提案した理由として、もっとも適するものを選びなさい。
+                        </div>
+                        <div class="question-text">
+                            <strong>下線部(3):</strong> "Let's go to the science lab."
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item correct-choice">① 理科室が音楽室から近いから。</div>
+                            <div class="option-item">② 理科室が音楽室から遠いから。</div>
+                            <div class="option-item selected">③ 美術室の場所がわからないから。</div>
+                            <div class="option-item">④ 調理室で休憩したいから。</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">①</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">①</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は①でした。会話の中で「It's near the music room.」(音楽室の近くだよ)と言っているので、理科室が音楽室から近いことが提案の理由です。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題10-2-4 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 10-(2)④</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> NaoとEthanの、この後の動きとして、もっとも適するものを選びなさい。
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item correct-choice">① 音楽室 → 理科室 → 美術室 → 調理室</div>
+                            <div class="option-item">② 調理室 → 音楽室 → 美術室 → 理科室</div>
+                            <div class="option-item">③ 音楽室 → 美術室 → 理科室 → 調理室</div>
+                            <div class="option-item">④ 理科室 → 音楽室 → 調理室 → 美術室</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">無回答</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">①</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">無回答でした!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は①でした。会話の流れ:<br>
+                            1. Let's go to the music room first. (音楽室)<br>
+                            2. Let's go to the science lab. (理科室)<br>
+                            3. Let's make our postcards there. (美術室)<br>
+                            4. Let's have a break at the cooking room. (調理室)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題10-2-5 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 10-(2)⑤</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> 本文の内容に合うもっとも適切なものを選びなさい。
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item">① この学校では、春にschool festival(文化祭)を行っている。</div>
+                            <div class="option-item correct-choice">② この学校では正門の照明が太陽光発電で点灯する。</div>
+                            <div class="option-item selected">③ Naoは理科が好きだが、Ethanは理科が得意ではない。</div>
+                            <div class="option-item">④ Ethanには、アメリカに祖父母がいる。</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">③</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">②</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は②でした。アナウンスで "It can turn on lights at the entrance!"(入口の照明をつけられます)と言っています。<br>
+                            <br>
+                            ④は間違い: Ethanの祖父母は"in the U.K."(イギリス)にいます。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題11 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 11</div>
+                        <div class="status-badge">英作文 (A〜C)</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題:</strong> 下の《メニュー》からあなたの注文したいものを伝えます。《条件》にしたがって、あなた自身の答えを英文一文で書きなさい。
+                        </div>
+                        
+                        <div class="menu-box">
+                            <div class="menu-title">🍜 MENU 🍜</div>
+                            <div class="menu-item">★ tomato soup</div>
+                            <div class="menu-item">★ chicken soup</div>
+                            <div class="menu-item">★ vegetable soup</div>
+                        </div>
+                        
+                        <div class="condition-box">
+                            <strong>《条件》</strong><br><br>
+                            ① <strong>can</strong> を必ず用いること。<br><br>
+                            ② ①に示した語を含んで<strong>3語以上の疑問文</strong>で書くこと。<br><br>
+                            ※短縮形(「I'm」や「don't」など)は1語と数え、符号(「,」など)は語数に含みません。
+                        </div>
+                    </div>
+                    
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <p>この問題は英作文です。条件に従って文を作成します。</p>
+                            <div class="grammar-point">
+                                <div class="grammar-title">📚 "can" を使った注文の表現</div>
+                                <div class="grammar-content">
+                                    <strong>模範解答例:</strong><br>
+                                    • Can I have tomato soup? (5語)<br>
+                                    • Can I get chicken soup? (5語)<br>
+                                    • Can I have vegetable soup? (5語)<br>
+                                    <br>
+                                    <strong>ポイント:</strong><br>
+                                    ・"Can I have 〜?" = 「〜をもらえますか?」<br>
+                                    ・"Can I get 〜?" = 「〜をもらえますか?」<br>
+                                    ・必ず "can" を使う<br>
+                                    ・3語以上の疑問文で書く<br>
+                                    ・最後に「?」をつける
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 完了メッセージ -->
+                <div class="completion-message">
+                    <h2>🎉 全8ページ復習完了! 🎉</h2>
+                    <p>
+                        お疲れ様でした!<br>
+                        間違えた問題をしっかり復習して、次回のテストに活かしましょう。<br>
+                        <br>
+                        <strong>特に復習が必要な分野:</strong><br>
+                        • リスニング(動作動詞の聞き分け)<br>
+                        • be動詞と一般動詞の疑問文の答え方<br>
+                        • 楽器の前には "the" をつける<br>
+                        • 長文読解(内容理解と時刻計算)<br>
+                        • 場所や位置を表す表現<br>
+                        • 語順整理問題<br>
+                        <br>
+                        頑張ってください!💪
+                    </p>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</body>
+</html>

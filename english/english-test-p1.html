@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英語テスト復習 - Page 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+            background: #f0f0f0;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .page-layout {
+            display: flex;
+            max-width: 100%;
+        }
+        
+        .side-nav {
+            width: 80px;
+            background: #333;
+            min-height: 100vh;
+            padding: 20px 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            display: block;
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            background: #555;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .nav-item:hover {
+            background: #666;
+            transform: translateX(5px);
+        }
+        
+        .nav-item.active {
+            background: #ff6b35;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        }
+        
+        .main-content {
+            margin-left: 80px;
+            flex: 1;
+        }
+        
+        .container {
+            max-width: 1194px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header .page-info {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        
+        .question-card {
+            background: white;
+            border-radius: 0;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .question-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            background: #ff6b35;
+        }
+        
+        .question-header {
+            background: #333;
+            color: white;
+            padding: 15px 20px 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .question-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            background: white;
+            color: #333;
+        }
+        
+        .status-badge.incorrect {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .question-content {
+            padding: 20px 25px;
+        }
+        
+        .question-text {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+        
+        .answer-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 0 25px 15px 25px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        .answer-box {
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .answer-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .answer-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .your-answer {
+            background: #fff;
+            border: 2px solid #ddd;
+        }
+        
+        .your-answer.incorrect .answer-value {
+            color: #dc3545;
+        }
+        
+        .correct-answer {
+            background: #fff;
+            border: 2px solid #333;
+        }
+        
+        .correct-answer .answer-value {
+            color: #333;
+        }
+        
+        .explanation {
+            background: #fff9e6;
+            border-left: 4px solid #ff6b35;
+            padding: 15px;
+            margin: 0 25px 20px 25px;
+            border-radius: 5px;
+        }
+        
+        .explanation-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff6b35;
+            margin-bottom: 10px;
+        }
+        
+        .explanation-content {
+            font-size: 15px;
+            color: #333;
+            line-height: 1.8;
+        }
+        
+        .grammar-point {
+            background: #fff9e6;
+            border: 1px solid #ff6b35;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        
+        .grammar-title {
+            font-weight: bold;
+            color: #ff6b35;
+            margin-bottom: 5px;
+        }
+        
+        .grammar-content {
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .options-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .option-item {
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .option-item.selected {
+            background: #ffe6e6;
+            border: 2px solid #dc3545;
+        }
+        
+        .option-item.correct-choice {
+            background: #fff;
+            border: 2px solid #333;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-layout">
+        <nav class="side-nav">
+            <a href="english-test-p1.html" class="nav-item active">P1</a>
+            <a href="english-test-p2.html" class="nav-item">P2</a>
+            <a href="english-test-p3.html" class="nav-item">P3</a>
+            <a href="english-test-p4.html" class="nav-item">P4</a>
+            <a href="english-test-p5.html" class="nav-item">P5</a>
+            <a href="english-test-p6.html" class="nav-item">P6</a>
+            <a href="english-test-p7.html" class="nav-item">P7</a>
+            <a href="english-test-p8.html" class="nav-item">P8</a>
+        </nav>
+        
+        <div class="main-content">
+            <div class="container">
+                <div class="header">
+                    <h1>第1学年 後期中間試験【英語】復習</h1>
+                    <div class="page-info">元の問題集: p.1 (問題1-2 リスニング)</div>
+                </div>
+                
+                <!-- 問題1-3 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 1-(3)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題1:</strong> Ayaが英語授業で「Who is this?」ゲームをします。放送される(1)〜(3)の紹介を聞き、それぞれの内容としてもっとも適する絵を、次の①〜④の中から1つずつ選び、その番号を答えなさい。
+                        </div>
+                        <div class="question-text">
+                            <strong>(3)の問題:</strong> リスニングで聞いた内容に合う絵を選ぶ
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">① (泳いでいる人)</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">③ (走っている人)</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です。しっかり復習しましょう!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は③(走っている人)でした。イラスト①は泳いでいる人なので、リスニングで「running」と聞こえたら③を選びます。
+                            </p>
+                            <div class="grammar-point">
+                                <div class="grammar-title">📚 間違いやすい動作動詞</div>
+                                <div class="grammar-content">
+                                    <strong>swimming (泳ぐ)</strong> と <strong>running (走る)</strong> は発音が似ているので注意!<br>
+                                    ・swimming: 「スイミング」水の中の動作<br>
+                                    ・running: 「ランニング」地面を走る動作<br>
+                                    <br>
+                                    <strong>リスニングのコツ:</strong><br>
+                                    ・最初の音に注意(s で始まるか r で始まるか)<br>
+                                    ・イラストをよく見て、水があるか、地面で走っているかを確認
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題2-2 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 2-(2)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>問題2:</strong> AnnaとLenが話しています。まずAnnaが話し、次にLenが話し、その後に交互に話します。対話の最後でLenが話す言葉のかわりにチャイムが鳴ります。そのチャイムのところに入るLenの言葉として、もっとも適するものを、あとの①〜④の中から1つずつ選び、その番号を答えなさい。
+                        </div>
+                        <div class="question-text">
+                            <strong>(2)の会話:</strong> 何かについて「〜ですか?」と聞かれて答える場面
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item">① Yes, you are.</div>
+                            <div class="option-item correct-choice">② No, it isn't.</div>
+                            <div class="option-item">③ Really?</div>
+                            <div class="option-item selected">④ OK.</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">④</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">②</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です。しっかり復習しましょう!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は② No, it isn't. でした。<br>
+                            この会話では、何かについて「〜ですか?」と聞かれて否定で答える場面だったと考えられます。
+                            </p>
+                            <div class="grammar-point">
+                                <div class="grammar-title">📚 be動詞の疑問文と答え方</div>
+                                <div class="grammar-content">
+                                    <strong>Is this/that 〜?</strong> という質問には:<br>
+                                    ・肯定: Yes, it is. (はい、そうです)<br>
+                                    ・否定: No, it isn't. / No, it's not. (いいえ、違います)<br>
+                                    <br>
+                                    <strong>重要ポイント:</strong><br>
+                                    ・This/Thatで聞かれたら、答えは "it" を使う<br>
+                                    ・"Yes, you are." は「あなたは〜です」という意味で、物について答える時には使わない<br>
+                                    ・"OK." や "Really?" は同意や驚きを表すが、Yes/No疑問文の答えにはならない<br>
+                                    <br>
+                                    <strong>例:</strong><br>
+                                    Q: Is that your pen? (あれはあなたのペンですか?)<br>
+                                    A: No, it isn't. (いいえ、違います)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題2-3 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 2-(3)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>(3)の会話:</strong> 一般動詞の疑問文に答える場面
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item selected">① At night.</div>
+                            <div class="option-item">② At home.</div>
+                            <div class="option-item">③ With my friend.</div>
+                            <div class="option-item correct-choice">④ Yes, I do.</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">①</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">④</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です。しっかり復習しましょう!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は④ Yes, I do. でした。<br>
+                            この問題では "Do you 〜?" という一般動詞の疑問文に答える場面でした。
+                            </p>
+                            <div class="grammar-point">
+                                <div class="grammar-title">📚 一般動詞の疑問文と答え方</div>
+                                <div class="grammar-content">
+                                    <strong>Do you 〜?</strong> という質問には:<br>
+                                    ・肯定: Yes, I do. (はい、します)<br>
+                                    ・否定: No, I don't. (いいえ、しません)<br>
+                                    <br>
+                                    <strong>なぜ①②③は間違い?</strong><br>
+                                    ・① At night. = 「夜に」→ When(いつ)を聞かれた時の答え<br>
+                                    ・② At home. = 「家で」→ Where(どこで)を聞かれた時の答え<br>
+                                    ・③ With my friend. = 「友達と」→ Who(誰と)を聞かれた時の答え<br>
+                                    <br>
+                                    <strong>疑問詞と答え方の対応:</strong><br>
+                                    ・Do you 〜? → Yes, I do. / No, I don't.<br>
+                                    ・When do you 〜? → At night. / In the morning. など<br>
+                                    ・Where do you 〜? → At home. / At school. など<br>
+                                    ・Who do you 〜 with? → With my friend. など<br>
+                                    <br>
+                                    <strong>見分け方:</strong> 質問文に When/Where/Who などの疑問詞がなく、ただ "Do you 〜?" だけなら、答えは Yes/No で答えます!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 問題2-4 -->
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">問題 2-(4)</div>
+                        <div class="status-badge incorrect">不正解 ✗</div>
+                    </div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            <strong>(4)の会話:</strong> 「これは誰のギターですか?」のような質問に答える場面
+                        </div>
+                        <div class="options-list">
+                            <div class="option-item selected">① I see.</div>
+                            <div class="option-item">② This is yours.</div>
+                            <div class="option-item">③ That's good.</div>
+                            <div class="option-item correct-choice">④ It's Ms. Tanaka's guitar.</div>
+                        </div>
+                    </div>
+                    <div class="answer-section">
+                        <div class="answer-box your-answer incorrect">
+                            <div class="answer-label">あなたの解答</div>
+                            <div class="answer-value">①</div>
+                        </div>
+                        <div class="answer-box correct-answer">
+                            <div class="answer-label">正解</div>
+                            <div class="answer-value">④</div>
+                        </div>
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">💡 解説</div>
+                        <div class="explanation-content">
+                            <strong style="color: #dc3545;">間違えた問題です。しっかり復習しましょう!</strong>
+                            <p style="margin-top: 10px;">
+                            正解は④ It's Ms. Tanaka's guitar. でした。<br>
+                            この会話では「これは誰のギターですか?」のような質問に答える場面だったと考えられます。
+                            </p>
+                            <div class="grammar-point">
+                                <div class="grammar-title">📚 所有格('s)の使い方</div>
+                                <div class="grammar-content">
+                                    <strong>〜's</strong> = 「〜のもの」を表す所有格<br>
+                                    ・Ms. Tanaka's guitar = 田中先生のギター<br>
+                                    ・my sister's bag = 私の姉のバッグ<br>
+                                    ・Tom's book = トムの本<br>
+                                    <br>
+                                    <strong>Whose(誰の)の質問と答え方:</strong><br>
+                                    Q: Whose guitar is this? (これは誰のギターですか?)<br>
+                                    A: It's Ms. Tanaka's guitar. (田中先生のギターです)<br>
+                                    <br>
+                                    <strong>なぜ①②③は間違い?</strong><br>
+                                    ・① I see. = 「わかりました」→ 相づち(質問の答えではない)<br>
+                                    ・② This is yours. = 「これはあなたのです」→ 所有者が違う<br>
+                                    ・③ That's good. = 「それは良いですね」→ 感想(質問の答えではない)<br>
+                                    <br>
+                                    <strong>重要:</strong> Whoseで聞かれたら、必ず「〜's + 物」の形で答えます!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</body>
+</html>
