@@ -5,6 +5,93 @@
 const Staff = {
     
     // ====================================
+    // 固有スキル定義
+    // ====================================
+    
+    specialSkills: [
+        {
+            id: 'sales_master',
+            name: '接客の神',
+            icon: '🌟',
+            description: '客単価が10%アップ',
+            effect: { customerSpendBoost: 1.1 },
+            rarity: 'rare',
+        },
+        {
+            id: 'stock_master',
+            name: '品出しマスター',
+            icon: '📦',
+            description: '廃棄が20%減少',
+            effect: { wasteReduction: 0.8 },
+            rarity: 'uncommon',
+        },
+        {
+            id: 'night_owl',
+            name: '夜型人間',
+            icon: '🦉',
+            description: '深夜帯の効率2倍',
+            effect: { nightEfficiency: 2.0 },
+            rarity: 'uncommon',
+        },
+        {
+            id: 'morning_person',
+            name: '朝型人間',
+            icon: '🌅',
+            description: '朝の時間帯の効率1.5倍',
+            effect: { morningEfficiency: 1.5 },
+            rarity: 'uncommon',
+        },
+        {
+            id: 'speed_demon',
+            name: 'スピードスター',
+            icon: '⚡',
+            description: 'レジ処理速度1.3倍',
+            effect: { registerSpeed: 1.3 },
+            rarity: 'uncommon',
+        },
+        {
+            id: 'friendly',
+            name: '愛されキャラ',
+            icon: '💕',
+            description: '常連客が増えやすい',
+            effect: { regularBoost: 1.5 },
+            rarity: 'rare',
+        },
+        {
+            id: 'eagle_eye',
+            name: '鷹の目',
+            icon: '👁️',
+            description: '万引き発見率UP',
+            effect: { theftPrevention: 0.5 },
+            rarity: 'uncommon',
+        },
+        {
+            id: 'tireless',
+            name: 'タフガイ',
+            icon: '💪',
+            description: 'モチベーションが下がりにくい',
+            effect: { motivationDecay: 0.5 },
+            rarity: 'uncommon',
+        },
+        {
+            id: 'lucky',
+            name: '幸運の持ち主',
+            icon: '🍀',
+            description: 'トラブル発生率-20%',
+            effect: { troubleReduction: 0.8 },
+            rarity: 'rare',
+        },
+        {
+            id: 'genius',
+            name: '天才',
+            icon: '🧠',
+            description: 'スキル成長2倍',
+            effect: { skillGrowth: 2.0 },
+            rarity: 'legendary',
+        },
+    ],
+    
+    // ====================================
     // バイト生成
     // ====================================
     
@@ -15,6 +102,7 @@ const Staff = {
     generate(customName = null) {
         const name = customName || this.getRandomName();
         const personality = this.getRandomPersonality();
+        const specialSkill = this.rollSpecialSkill();
         
         // スプライトを順番に割り当て（ランダムでもOK）
         const sprite = this.spriteNames[this.spriteIndex % this.spriteNames.length];
@@ -30,6 +118,7 @@ const Staff = {
                 clean: Math.floor(Math.random() * 3) + 1,
             },
             personality: personality,
+            specialSkill: specialSkill,  // 固有スキル追加
             shifts: { 
                 morning: false, 
                 noon: false, 
@@ -43,7 +132,39 @@ const Staff = {
             sprite: sprite,  // ドット絵スプライト名
         };
         
+        // 固有スキルで時給調整
+        if (specialSkill) {
+            if (specialSkill.rarity === 'legendary') {
+                staff.wage += 200;
+            } else if (specialSkill.rarity === 'rare') {
+                staff.wage += 100;
+            }
+        }
+        
         return staff;
+    },
+    
+    rollSpecialSkill() {
+        const roll = Math.random();
+        
+        // 30%の確率で固有スキルなし
+        if (roll < 0.3) return null;
+        
+        // レアリティ抽選
+        let pool;
+        if (roll < 0.35) {
+            // 5%でレジェンダリー
+            pool = this.specialSkills.filter(s => s.rarity === 'legendary');
+        } else if (roll < 0.5) {
+            // 15%でレア
+            pool = this.specialSkills.filter(s => s.rarity === 'rare');
+        } else {
+            // 50%でアンコモン
+            pool = this.specialSkills.filter(s => s.rarity === 'uncommon');
+        }
+        
+        if (pool.length === 0) return null;
+        return pool[Math.floor(Math.random() * pool.length)];
     },
     
     getRandomName() {

@@ -14,8 +14,11 @@ const UI = {
         this.renderStaff();
         this.renderInvestments();
         this.renderMissions();
+        this.renderCampaign();
+        this.renderLocation();
         this.renderDevelopment();
         this.renderBank();
+        this.renderAchievements();
         this.renderInfo();
     },
     
@@ -67,7 +70,7 @@ const UI = {
     },
     
     // ====================================
-    // 商品リスト
+    // 商品リスト（スライダー式発注UI）
     // ====================================
     
     renderProducts() {
@@ -77,6 +80,8 @@ const UI = {
             const stock = GameState.getInventoryQty(p.id);
             const order = GameState.orders[p.id] || 0;
             const orderCost = order * p.cost;
+            const maxAffordable = Math.floor(GameState.cash / p.cost);
+            const sliderMax = Math.max(100, Math.ceil(order / 100) * 100 + 100);
             
             html += `
                 <div class="product-item">
@@ -85,14 +90,33 @@ const UI = {
                         <div class="product-meta">
                             <span>原価¥${p.cost}</span>
                             <span>売価¥${p.price}</span>
-                            <span>在庫${stock}</span>
+                            <span class="${stock === 0 ? 'stock-zero' : stock < 10 ? 'stock-low' : ''}">在庫${stock}</span>
                             <span>期限${p.expiry === 999 ? '∞' : p.expiry + '日'}</span>
                         </div>
                     </div>
-                    <div class="product-controls">
-                        <button class="qty-btn" data-product="${p.id}" data-action="sub">−</button>
-                        <div class="qty-value">${order}</div>
-                        <button class="qty-btn" data-product="${p.id}" data-action="add">＋</button>
+                    <div class="product-order-ui">
+                        <div class="order-display">
+                            <span class="order-label">発注:</span>
+                            <span class="order-value" id="order-val-${p.id}">${order}</span>
+                            <span class="order-cost" id="order-cost-${p.id}">（¥${orderCost.toLocaleString()}）</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" 
+                                   class="order-slider" 
+                                   id="slider-${p.id}"
+                                   data-product="${p.id}"
+                                   min="0" 
+                                   max="${sliderMax}" 
+                                   step="10" 
+                                   value="${order}">
+                            <div class="slider-ticks" id="ticks-${p.id}"></div>
+                        </div>
+                        <div class="quick-buttons">
+                            <button class="quick-btn" data-product="${p.id}" data-action="clear">0</button>
+                            <button class="quick-btn" data-product="${p.id}" data-action="add50">+50</button>
+                            <button class="quick-btn" data-product="${p.id}" data-action="add100">+100</button>
+                            <button class="quick-btn max-btn" data-product="${p.id}" data-action="max">MAX</button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -122,6 +146,7 @@ const UI = {
                                     <span class="staff-personality">${s.personality.name}</span>
                                     <span class="staff-wage">時給¥${s.wage}</span>
                                 </div>
+                                ${s.specialSkill ? `<div class="staff-special">${s.specialSkill.icon} ${s.specialSkill.name}</div>` : ''}
                                 <div class="staff-skills">
                                     <span class="skill">レジ${Staff.getSkillStars(s.skills.register)}</span>
                                     <span class="skill">品出${Staff.getSkillStars(s.skills.stock)}</span>
@@ -236,6 +261,158 @@ const UI = {
             });
         }
         document.getElementById('completed-missions').innerHTML = completedHtml;
+    },
+
+    // ====================================
+    // キャンペーンタブ
+    // ====================================
+    
+    renderCampaign() {
+        const status = Campaign.getStatus();
+        let statusHtml = '';
+        
+        if (status.active) {
+            statusHtml = `
+                <div class="campaign-active">
+                    <div class="campaign-active-header">
+                        <span class="campaign-icon">${status.active.icon}</span>
+                        <span class="campaign-name">${status.active.name}</span>
+                    </div>
+                    <div class="campaign-remaining">残り${status.active.remainingDays}日</div>
+                    <div class="campaign-effect">来客 ×${status.active.customerBoost}</div>
+                </div>
+            `;
+        } else if (status.cooldown > 0) {
+            statusHtml = `<div class="campaign-cooldown">クールダウン中（残り${status.cooldown}日）</div>`;
+        } else {
+            statusHtml = '<div class="no-campaign">キャンペーン実施可能</div>';
+        }
+        document.getElementById('campaign-status').innerHTML = statusHtml;
+        
+        let listHtml = '';
+        status.available.forEach(c => {
+            const canStart = !status.active && status.cooldown === 0 && GameState.cash >= c.cost;
+            listHtml += `
+                <div class="campaign-item">
+                    <div class="campaign-header">
+                        <span class="campaign-icon">${c.icon}</span>
+                        <span class="campaign-name">${c.name}</span>
+                    </div>
+                    <div class="campaign-desc">${c.description}</div>
+                    <div class="campaign-stats">
+                        <span>費用: ¥${c.cost.toLocaleString()}</span>
+                        <span>期間: ${c.duration}日</span>
+                        <span>来客: ×${c.customerBoost}</span>
+                    </div>
+                    <button class="campaign-btn" data-campaign="${c.id}" ${!canStart ? 'disabled' : ''}>実施</button>
+                </div>
+            `;
+        });
+        document.getElementById('campaign-list').innerHTML = listHtml;
+    },
+    
+    // ====================================
+    // 立地タブ
+    // ====================================
+    
+    renderLocation() {
+        const status = Location.getStatus();
+        let statusHtml = `
+            <div class="location-current">
+                <div class="location-icon">${status.current.icon}</div>
+                <div class="location-info">
+                    <div class="location-name">${status.current.name}</div>
+                    <div class="location-desc">${status.current.description}</div>
+                    <div class="location-stats">
+                        <span>家賃: ¥${status.dailyRent.toLocaleString()}/日</span>
+                        <span>店舗数: ${status.storeCount}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('location-status').innerHTML = statusHtml;
+        
+        let listHtml = '';
+        
+        // 解放済み立地
+        status.available.forEach(loc => {
+            const canMove = GameState.cash >= loc.moveCost;
+            listHtml += `
+                <div class="location-item">
+                    <div class="location-header">
+                        <span class="location-icon">${loc.icon}</span>
+                        <span class="location-name">${loc.name}</span>
+                    </div>
+                    <div class="location-desc">${loc.description}</div>
+                    <div class="location-stats">
+                        <span>家賃: ¥${loc.rent.toLocaleString()}/日</span>
+                        <span>基本客数: ${loc.baseCustomers}</span>
+                    </div>
+                    <button class="location-btn" data-location="${loc.id}" data-action="move" ${!canMove ? 'disabled' : ''}>
+                        移転（¥${loc.moveCost.toLocaleString()}）
+                    </button>
+                </div>
+            `;
+        });
+        
+        // 未解放立地
+        status.locked.forEach(loc => {
+            const canUnlock = GameState.cash >= loc.unlockCost;
+            listHtml += `
+                <div class="location-item locked">
+                    <div class="location-header">
+                        <span class="location-icon">🔒</span>
+                        <span class="location-name">${loc.name}</span>
+                    </div>
+                    <div class="location-desc">${loc.description}</div>
+                    <button class="location-btn unlock" data-location="${loc.id}" data-action="unlock" ${!canUnlock ? 'disabled' : ''}>
+                        解放（¥${loc.unlockCost.toLocaleString()}）
+                    </button>
+                </div>
+            `;
+        });
+        
+        document.getElementById('location-list').innerHTML = listHtml;
+    },
+    
+    // ====================================
+    // 実績タブ
+    // ====================================
+    
+    renderAchievements() {
+        const status = Achievements.getStatus();
+        
+        let progressHtml = `
+            <div class="achievement-progress-bar">
+                <div class="achievement-progress-fill" style="width: ${status.percentage}%"></div>
+            </div>
+            <div class="achievement-progress-text">${status.unlockedCount} / ${status.totalCount} (${status.percentage}%)</div>
+        `;
+        document.getElementById('achievement-progress').innerHTML = progressHtml;
+        
+        let listHtml = '';
+        Object.keys(status.categories).forEach(catId => {
+            const cat = status.categories[catId];
+            listHtml += `<div class="achievement-category">
+                <div class="achievement-category-title">${cat.name}</div>
+                <div class="achievement-grid">`;
+            
+            cat.achievements.forEach(a => {
+                listHtml += `
+                    <div class="achievement-item ${a.unlocked ? 'unlocked' : 'locked'}">
+                        <div class="achievement-icon">${a.unlocked ? a.icon : '❓'}</div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">${a.unlocked ? a.name : '???'}</div>
+                            <div class="achievement-desc">${a.unlocked ? a.description : '未解放'}</div>
+                            ${a.unlocked ? `<div class="achievement-reward">報酬: ¥${a.reward.toLocaleString()}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            listHtml += '</div></div>';
+        });
+        document.getElementById('achievement-list').innerHTML = listHtml;
     },
 
     // ====================================
@@ -358,6 +535,26 @@ const UI = {
             secHtml += '</div>';
         }
         document.getElementById('security-status').innerHTML = secHtml;
+        
+        // 仕入れ先
+        const supStatus = Suppliers.getStatus();
+        let supHtml = `
+            <div class="supplier-current">
+                <span class="supplier-icon">${supStatus.current.icon}</span>
+                <span class="supplier-name">${supStatus.current.name}</span>
+                <span class="supplier-cost">コスト×${supStatus.current.costMultiplier}</span>
+            </div>
+            <div class="supplier-list">
+        `;
+        supStatus.available.filter(s => s.id !== supStatus.current.id).forEach(s => {
+            supHtml += `
+                <button class="supplier-btn" data-supplier="${s.id}">
+                    ${s.icon} ${s.name}（×${s.costMultiplier}）
+                </button>
+            `;
+        });
+        supHtml += '</div>';
+        document.getElementById('supplier-status').innerHTML = supHtml;
     },
 
     // ====================================

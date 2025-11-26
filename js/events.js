@@ -64,25 +64,87 @@ const Events = {
         this.bindInvestEvents();
         this.bindDevelopEvents();
         this.bindBankEvents();
+        this.bindCampaignEvents();
+        this.bindLocationEvents();
     },
     
     bindProductEvents() {
-        document.querySelectorAll('.qty-btn').forEach(btn => {
+        // スライダーイベント
+        document.querySelectorAll('.order-slider').forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const productId = slider.dataset.product;
+                const value = parseInt(e.target.value);
+                const product = CONFIG.getProduct(productId);
+                
+                GameState.orders[productId] = value;
+                
+                // 表示更新（アニメーション付き）
+                const valEl = document.getElementById(`order-val-${productId}`);
+                const costEl = document.getElementById(`order-cost-${productId}`);
+                valEl.textContent = value;
+                valEl.classList.add('value-pop');
+                setTimeout(() => valEl.classList.remove('value-pop'), 150);
+                costEl.textContent = `（¥${(value * product.cost).toLocaleString()}）`;
+                
+                // 触覚フィードバック（10単位でカチッと）
+                if (value % 10 === 0 && navigator.vibrate) {
+                    navigator.vibrate(5);
+                }
+            });
+            
+            // スライダー範囲の動的拡張
+            slider.addEventListener('change', (e) => {
+                const productId = slider.dataset.product;
+                const value = parseInt(e.target.value);
+                const currentMax = parseInt(slider.max);
+                
+                // 上限に近づいたら拡張
+                if (value >= currentMax - 20) {
+                    slider.max = currentMax + 100;
+                }
+            });
+        });
+        
+        // クイックボタンイベント
+        document.querySelectorAll('.quick-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const productId = btn.dataset.product;
                 const action = btn.dataset.action;
+                const product = CONFIG.getProduct(productId);
+                const slider = document.getElementById(`slider-${productId}`);
+                let newValue = GameState.orders[productId] || 0;
                 
-                if (action === 'add') {
-                    const product = CONFIG.getProduct(productId);
-                    const orderCost = CONFIG.game.orderUnit * product.cost;
-                    // 発注は予約なのでチェックは緩めに
-                    GameState.orders[productId] = (GameState.orders[productId] || 0) + CONFIG.game.orderUnit;
-                } else {
-                    GameState.orders[productId] = Math.max(0, (GameState.orders[productId] || 0) - CONFIG.game.orderUnit);
+                if (action === 'clear') {
+                    newValue = 0;
+                } else if (action === 'add50') {
+                    newValue += 50;
+                } else if (action === 'add100') {
+                    newValue += 100;
+                } else if (action === 'max') {
+                    // 所持金で買える最大数
+                    newValue = Math.floor(GameState.cash / product.cost);
                 }
                 
-                UI.renderProducts();
-                this.bindProductEvents();
+                GameState.orders[productId] = newValue;
+                slider.value = newValue;
+                
+                // スライダーmax拡張
+                if (newValue >= parseInt(slider.max) - 20) {
+                    slider.max = Math.ceil(newValue / 100) * 100 + 100;
+                }
+                
+                // 表示更新
+                const valEl = document.getElementById(`order-val-${productId}`);
+                const costEl = document.getElementById(`order-cost-${productId}`);
+                valEl.textContent = newValue;
+                valEl.classList.add('value-pop');
+                setTimeout(() => valEl.classList.remove('value-pop'), 150);
+                costEl.textContent = `（¥${(newValue * product.cost).toLocaleString()}）`;
+                
+                // 触覚フィードバック
+                if (navigator.vibrate) {
+                    navigator.vibrate(10);
+                }
             });
         });
     },
@@ -196,6 +258,63 @@ const Events = {
                 if (result.success) {
                     UI.renderBank();
                     UI.renderHeader();
+                }
+                alert(result.message);
+            });
+        });
+        
+        // 仕入れ先変更
+        document.querySelectorAll('.supplier-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const supplierId = btn.dataset.supplier;
+                const result = Suppliers.switchSupplier(supplierId);
+                if (result.success) {
+                    UI.renderBank();
+                }
+                alert(result.message);
+            });
+        });
+    },
+    
+    // ====================================
+    // キャンペーンイベント
+    // ====================================
+    
+    bindCampaignEvents() {
+        document.querySelectorAll('.campaign-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const campaignId = btn.dataset.campaign;
+                const result = Campaign.startCampaign(campaignId);
+                if (result.success) {
+                    UI.renderCampaign();
+                    UI.renderHeader();
+                }
+                alert(result.message);
+            });
+        });
+    },
+    
+    // ====================================
+    // 立地イベント
+    // ====================================
+    
+    bindLocationEvents() {
+        document.querySelectorAll('.location-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const locationId = btn.dataset.location;
+                const action = btn.dataset.action;
+                let result;
+                
+                if (action === 'unlock') {
+                    result = Location.unlockLocation(locationId);
+                } else if (action === 'move') {
+                    result = Location.moveTo(locationId);
+                }
+                
+                if (result && result.success) {
+                    UI.renderLocation();
+                    UI.renderHeader();
+                    UI.renderInfo();
                 }
                 alert(result.message);
             });
