@@ -2,623 +2,170 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMINATI_EC - オンラインストア</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-            background-color: #ffffff;
-            color: #000000;
-            line-height: 1.6;
-        }
-        
-        /* ヘッダー */
-        header {
-            background-color: #ffffff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 30px;
-        }
-        
-        .logo {
-            font-size: 32px;
-            font-weight: 900;
-            letter-spacing: -2px;
-        }
-        
-        .header-nav {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-        
-        .cart-icon {
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            position: relative;
-        }
-        
-        .cart-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #ff0000;
-            color: #ffffff;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 700;
-        }
-        
-        /* ヒーローセクション */
-        .hero {
-            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-            padding: 80px 30px;
-            text-align: center;
-        }
-        
-        .hero h1 {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            letter-spacing: -1px;
-        }
-        
-        .hero p {
-            font-size: 18px;
-            color: #666666;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        /* カテゴリーナビゲーション */
-        .category-nav {
-            background: #f8f8f8;
-            padding: 20px 0;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .category-list {
-            display: flex;
-            gap: 20px;
-            padding: 0 30px;
-            max-width: 1400px;
-            margin: 0 auto;
-            min-width: max-content;
-        }
-        
-        .category-item {
-            padding: 10px 20px;
-            background: #ffffff;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            border: 2px solid transparent;
-        }
-        
-        .category-item:hover {
-            background: #000000;
-            color: #ffffff;
-        }
-        
-        .category-item.active {
-            background: #000000;
-            color: #ffffff;
-        }
-        
-        /* 商品グリッド */
-        .main-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 40px 30px;
-        }
-        
-        .section-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 30px;
-        }
-        
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px;
-            margin-bottom: 60px;
-        }
-        
-        .product-card {
-            background: #ffffff;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        
-        .product-image {
-            width: 100%;
-            aspect-ratio: 4/5;
-            object-fit: cover;
-            background: #f5f5f5;
-        }
-        
-        .product-info {
-            padding: 20px;
-        }
-        
-        .product-brand {
-            font-size: 12px;
-            color: #666666;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-        }
-        
-        .product-name {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            line-height: 1.4;
-            height: 2.8em;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-        
-        .product-price {
-            font-size: 18px;
-            font-weight: 700;
-        }
-        
-        .original-price {
-            font-size: 14px;
-            color: #999999;
-            text-decoration: line-through;
-            margin-right: 8px;
-        }
-        
-        .sale-price {
-            color: #ff0000;
-        }
-        
-        /* フッター */
-        footer {
-            background: #000000;
-            color: #ffffff;
-            padding: 40px 30px;
-            text-align: center;
-        }
-        
-        .footer-content {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        /* レスポンシブ */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 32px;
-            }
-            
-            .product-grid {
-                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-                gap: 15px;
-            }
-            
-            .category-list {
-                padding: 0 15px;
-            }
-        }
-        
-        /* ローディング */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666666;
-        }
-        
-        .no-products {
-            text-align: center;
-            padding: 60px 20px;
-            color: #666666;
-        }
-        
-        /* エラーメッセージ */
-        .error-message {
-            background: #fee;
-            color: #c33;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px;
-            text-align: center;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>コンビニ経営シミュレーション</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <h1 class="logo">AMINATI</h1>
-            <nav class="header-nav">
-                <div class="cart-icon">
-                    <div class="cart-badge">0</div>
+    <!-- タイトル画面 -->
+    <div id="title-screen">
+        <div class="title-logo">コンビニ経営</div>
+        <div class="title-sub">SIMULATION GAME</div>
+        <div class="title-desc">
+            30日間でコンビニを黒字経営に導こう！<br><br>
+            ・商品の発注と在庫管理<br>
+            ・バイトの採用とシフト管理<br>
+            ・廃棄ロスを減らして利益最大化<br><br>
+            目標：30日後に資産100万円以上
+        </div>
+        <button class="start-btn" id="start-btn">ゲーム開始</button>
+    </div>
+    
+    <!-- デイリーレポート -->
+    <div id="daily-report">
+        <div class="report-modal">
+            <div class="report-modal-header">
+                <div class="report-modal-title">営業レポート</div>
+                <div class="report-modal-day" id="report-day">1日目の結果</div>
+            </div>
+            <div id="report-content"></div>
+            
+            <!-- バイトからのコメント -->
+            <div id="staff-comments" class="staff-comments-section"></div>
+            
+            <button class="report-modal-btn" id="close-report">次の日へ</button>
+        </div>
+    </div>
+    
+    <!-- ゲームオーバー -->
+    <div id="game-over">
+        <div class="gameover-title" id="gameover-title">ゲーム終了</div>
+        <div class="gameover-stats" id="gameover-stats"></div>
+        <button class="retry-btn" id="retry-btn">もう一度プレイ</button>
+    </div>
+    
+    <!-- 雇用モーダル -->
+    <div id="hire-modal">
+        <div class="hire-modal-content">
+            <div class="hire-modal-title">バイト募集</div>
+            <div id="hire-candidates"></div>
+            <button class="close-modal-btn" id="close-hire">閉じる</button>
+        </div>
+    </div>
+    
+    <!-- メインゲーム画面 -->
+    <div id="game-container">
+        <div class="header">
+            <div class="header-top">
+                <div class="store-name">マイコンビニ</div>
+                <div class="day-display">
+                    <span id="current-day">1</span>日目
+                    <span id="day-of-week" class="dow-badge">（月）</span>
+                    <span id="season-display" class="season-badge">春</span>
                 </div>
-            </nav>
+            </div>
+            <div class="header-weather" id="header-weather">
+                <span class="weather-icon" id="weather-icon">☀️</span>
+                <span class="weather-name" id="weather-name">晴れ</span>
+                <span class="event-badge" id="event-badge"></span>
+            </div>
+            <div class="header-reputation">
+                <span class="reputation-label">評判</span>
+                <div class="reputation-bar">
+                    <div class="reputation-fill" id="reputation-fill" style="width: 50%"></div>
+                </div>
+                <span class="reputation-icon" id="reputation-icon">😐</span>
+            </div>
+            <div class="header-stats">
+                <div class="stat-box">
+                    <div class="stat-label">資産</div>
+                    <div class="stat-value neutral" id="stat-cash">¥500,000</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">昨日売上</div>
+                    <div class="stat-value positive" id="stat-sales">¥0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">昨日利益</div>
+                    <div class="stat-value" id="stat-profit">¥0</div>
+                </div>
+            </div>
         </div>
-    </header>
-    
-    <section class="hero">
-        <h1>AMINATI COLLECTION</h1>
-        <p>上質なライフスタイルを提案する、こだわりのセレクション</p>
-    </section>
-    
-    <nav class="category-nav">
-        <div class="category-list" id="categoryList">
-            <div class="category-item active" data-category="all">すべて</div>
-            <!-- カテゴリーは動的に追加される -->
+        
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab active" data-tab="order">発注</button>
+                <button class="tab" data-tab="staff">バイト</button>
+                <button class="tab" data-tab="invest">設備</button>
+                <button class="tab" data-tab="missions">目標</button>
+                <button class="tab" data-tab="info">情報</button>
+            </div>
+            
+            <!-- 発注タブ -->
+            <div class="section active" id="tab-order">
+                <div class="section-title">商品発注（明日届く）</div>
+                <div class="product-list" id="product-list"></div>
+            </div>
+            
+            <!-- バイトタブ -->
+            <div class="section" id="tab-staff">
+                <div class="section-title">
+                    バイト管理
+                    <button class="add-staff-btn" id="open-hire">＋募集</button>
+                </div>
+                <div class="staff-list" id="staff-list"></div>
+            </div>
+            
+            <!-- 設備タブ -->
+            <div class="section" id="tab-invest">
+                <div class="section-title">設備投資</div>
+                <div id="invest-list"></div>
+            </div>
+            
+            <!-- ミッションタブ -->
+            <div class="section" id="tab-missions">
+                <div class="section-title">🎯 本日の目標</div>
+                <div id="missions-list"></div>
+                <div class="section-title" style="margin-top: 20px;">✅ 達成済み</div>
+                <div id="completed-missions"></div>
+            </div>
+            
+            <!-- 情報タブ -->
+            <div class="section" id="tab-info">
+                <div class="section-title">経営情報</div>
+                <div class="report-section">
+                    <div class="report-title">現在の在庫</div>
+                    <div class="report-rows" id="inventory-info"></div>
+                </div>
+                <div class="report-section">
+                    <div class="report-title">時間帯別の傾向</div>
+                    <div class="report-rows" id="demand-info"></div>
+                </div>
+                <div class="report-section">
+                    <div class="report-title">評判の詳細</div>
+                    <div class="report-rows" id="reputation-info"></div>
+                </div>
+            </div>
         </div>
-    </nav>
-    
-    <main class="main-container">
-        <h2 class="section-title" id="sectionTitle">すべての商品</h2>
         
-        <div class="product-grid" id="productGrid">
-            <div class="loading">商品を読み込んでいます...</div>
+        <div class="footer">
+            <button class="next-day-btn" id="next-day-btn">翌日へ進む →</button>
         </div>
-        
-        <div class="no-products" id="noProducts" style="display: none;">
-            <p>表示する商品がありません</p>
-        </div>
-    </main>
-    
-    <footer>
-        <div class="footer-content">
-            <p>&copy; 2024 AMINATI_EC. All rights reserved.</p>
-        </div>
-    </footer>
-    
-    <script>
-        // グローバル変数
-        let allProducts = [];
-        let currentCategory = 'all';
-        let dbVersion = 2; // 現在のDBバージョン
-        
-        // デバッグ用ログ関数
-        function debugLog(message, data = null) {
-            console.log(`[AMINATI_EC Debug] ${message}`, data);
-        }
-        
-        // ページ読み込み時の処理
-        document.addEventListener('DOMContentLoaded', async () => {
-            debugLog('ページ読み込み開始');
-            
-            // IndexedDBのサポートチェック
-            if (!window.indexedDB) {
-                showError('このブラウザはIndexedDBをサポートしていません。');
-                return;
-            }
-            
-            await loadProducts();
-            setupCategoryFilters();
-        });
-        
-        // エラー表示関数
-        function showError(message) {
-            document.getElementById('productGrid').innerHTML = 
-                `<div class="error-message">${message}</div>`;
-            debugLog('エラー表示:', message);
-        }
-        
-        // 商品データの読み込み
-        async function loadProducts() {
-            try {
-                debugLog('商品データ読み込み開始');
-                
-                // IndexedDBから商品データを取得
-                const products = await getProductsFromDB();
-                
-                debugLog('取得した商品数:', products.length);
-                
-                if (products.length === 0) {
-                    document.getElementById('productGrid').innerHTML = '';
-                    document.getElementById('noProducts').style.display = 'block';
-                    return;
-                }
-                
-                allProducts = products;
-                updateCategories();
-                displayProducts();
-                
-            } catch (error) {
-                console.error('商品の読み込みエラー:', error);
-                showError(`エラーが発生しました: ${error.message}`);
-            }
-        }
-        
-        // IndexedDBから商品データを取得（改良版）
-        async function getProductsFromDB() {
-            return new Promise((resolve, reject) => {
-                let attempts = 0;
-                const maxAttempts = 3;
-                
-                function attemptConnection() {
-                    attempts++;
-                    debugLog(`データベース接続試行 ${attempts}/${maxAttempts}`);
-                    
-                    try {
-                        const request = indexedDB.open('AminatiECProducts', dbVersion);
-                        
-                        request.onerror = (event) => {
-                            debugLog('データベース接続エラー:', event.target.error);
-                            
-                            if (attempts < maxAttempts) {
-                                // リトライ
-                                setTimeout(attemptConnection, 1000);
-                            } else {
-                                showError('データベースに接続できませんでした。ブラウザの設定を確認してください。');
-                                resolve([]);
-                            }
-                        };
-                        
-                        request.onsuccess = (event) => {
-                            debugLog('データベース接続成功');
-                            const db = event.target.result;
-                            
-                            // オブジェクトストアの存在確認
-                            if (!db.objectStoreNames.contains('products')) {
-                                debugLog('productsストアが存在しません');
-                                db.close();
-                                resolve([]);
-                                return;
-                            }
-                            
-                            try {
-                                const transaction = db.transaction(['products'], 'readonly');
-                                const store = transaction.objectStore('products');
-                                const getAllRequest = store.getAll();
-                                
-                                getAllRequest.onsuccess = () => {
-                                    const products = getAllRequest.result || [];
-                                    debugLog('データ取得成功:', products.length + '件');
-                                    db.close();
-                                    resolve(products);
-                                };
-                                
-                                getAllRequest.onerror = (error) => {
-                                    debugLog('データ取得エラー:', error);
-                                    db.close();
-                                    resolve([]);
-                                };
-                                
-                                transaction.onerror = (error) => {
-                                    debugLog('トランザクションエラー:', error);
-                                    db.close();
-                                    resolve([]);
-                                };
-                                
-                            } catch (error) {
-                                debugLog('トランザクション作成エラー:', error);
-                                db.close();
-                                resolve([]);
-                            }
-                        };
-                        
-                        request.onupgradeneeded = (event) => {
-                            debugLog('データベースアップグレード中...');
-                            const db = event.target.result;
-                            
-                            // 既存のオブジェクトストアがあるかチェック
-                            if (!db.objectStoreNames.contains('products')) {
-                                debugLog('productsストアを作成');
-                                const store = db.createObjectStore('products', { keyPath: 'productNumber' });
-                                store.createIndex('createdAt', 'createdAt', { unique: false });
-                                store.createIndex('updatedAt', 'updatedAt', { unique: false });
-                                store.createIndex('category', 'productData.category', { unique: false });
-                            }
-                        };
-                        
-                        request.onblocked = () => {
-                            debugLog('データベースがブロックされています');
-                            showError('別のタブでデータベースが使用されています。他のタブを閉じて再読み込みしてください。');
-                            resolve([]);
-                        };
-                        
-                    } catch (error) {
-                        debugLog('予期しないエラー:', error);
-                        if (attempts < maxAttempts) {
-                            setTimeout(attemptConnection, 1000);
-                        } else {
-                            resolve([]);
-                        }
-                    }
-                }
-                
-                attemptConnection();
-            });
-        }
-        
-        // カテゴリーの更新
-        function updateCategories() {
-            const categories = new Set(['all']);
-            
-            allProducts.forEach(product => {
-                if (product.productData && product.productData.category) {
-                    categories.add(product.productData.category);
-                }
-            });
-            
-            const categoryList = document.getElementById('categoryList');
-            categoryList.innerHTML = '';
-            
-            // 「すべて」カテゴリーを追加
-            const allItem = createCategoryElement('all', 'すべて');
-            allItem.classList.add('active');
-            categoryList.appendChild(allItem);
-            
-            // その他のカテゴリーを追加
-            Array.from(categories).slice(1).sort().forEach(category => {
-                const item = createCategoryElement(category, category);
-                categoryList.appendChild(item);
-            });
-        }
-        
-        // カテゴリー要素の作成
-        function createCategoryElement(value, text) {
-            const item = document.createElement('div');
-            item.className = 'category-item';
-            item.dataset.category = value;
-            item.textContent = text;
-            return item;
-        }
-        
-        // カテゴリーフィルターの設定
-        function setupCategoryFilters() {
-            document.getElementById('categoryList').addEventListener('click', (e) => {
-                if (e.target.classList.contains('category-item')) {
-                    // アクティブクラスの切り替え
-                    document.querySelectorAll('.category-item').forEach(item => {
-                        item.classList.remove('active');
-                    });
-                    e.target.classList.add('active');
-                    
-                    // カテゴリーの変更
-                    currentCategory = e.target.dataset.category;
-                    
-                    // セクションタイトルの更新
-                    const title = currentCategory === 'all' ? 'すべての商品' : currentCategory;
-                    document.getElementById('sectionTitle').textContent = title;
-                    
-                    // 商品の再表示
-                    displayProducts();
-                }
-            });
-        }
-        
-        // 商品の表示
-        function displayProducts() {
-            const productGrid = document.getElementById('productGrid');
-            const noProducts = document.getElementById('noProducts');
-            
-            // フィルタリング
-            const filteredProducts = currentCategory === 'all' 
-                ? allProducts 
-                : allProducts.filter(p => p.productData && p.productData.category === currentCategory);
-            
-            if (filteredProducts.length === 0) {
-                productGrid.innerHTML = '';
-                noProducts.style.display = 'block';
-                return;
-            }
-            
-            noProducts.style.display = 'none';
-            productGrid.innerHTML = filteredProducts.map(product => {
-                const data = product.productData;
-                const hasDiscount = data.originalPrice && data.originalPrice != data.salePrice;
-                
-                return `
-                    <div class="product-card" onclick="openProduct('${product.productNumber}')">
-                        <img src="${getProductImage(product)}" alt="${data.productName}" class="product-image" loading="lazy">
-                        <div class="product-info">
-                            <div class="product-brand">${data.brandName || 'AMINATI'}</div>
-                            <h3 class="product-name">${data.productName}</h3>
-                            <div class="product-price">
-                                ${hasDiscount ? `<span class="original-price">¥${formatNumber(data.originalPrice)}</span>` : ''}
-                                <span class="${hasDiscount ? 'sale-price' : ''}">¥${formatNumber(data.salePrice)}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        // 商品画像の取得（改良版）
-        function getProductImage(product) {
-            try {
-                // HTMLから画像URLを抽出する
-                const match = product.html.match(/<img[^>]+src="([^"]+)"[^>]*class="main-image"/);
-                if (match && match[1]) {
-                    return match[1];
-                }
-                
-                // main-imageクラスがない場合の代替パターン
-                const altMatch = product.html.match(/<img[^>]+src="([^"]+)"/);
-                if (altMatch && altMatch[1]) {
-                    return altMatch[1];
-                }
-            } catch (error) {
-                debugLog('画像URL抽出エラー:', error);
-            }
-            
-            return 'https://via.placeholder.com/500x625/f5f5f5/666666?text=No+Image';
-        }
-        
-        // 商品ページを開く
-        function openProduct(productNumber) {
-            debugLog('商品ページを開く:', productNumber);
-            
-            const product = allProducts.find(p => p.productNumber === productNumber);
-            if (product && product.html) {
-                try {
-                    const blob = new Blob([product.html], { type: 'text/html;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-                    window.open(url, '_blank');
-                } catch (error) {
-                    debugLog('商品ページ表示エラー:', error);
-                    alert('商品ページの表示でエラーが発生しました。');
-                }
-            } else {
-                alert('商品が見つかりません。');
-            }
-        }
-        
-        // 数値のフォーマット
-        function formatNumber(num) {
-            return Number(num).toLocaleString();
-        }
-        
-        // 定期的に商品データを更新（30秒ごとに変更）
-        setInterval(() => {
-            debugLog('定期更新実行');
-            loadProducts();
-        }, 30000);
-        
-        // モバイルデバイスの検出
-        function isMobileDevice() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-        
-        // デバイス情報のログ出力
-        if (isMobileDevice()) {
-            debugLog('モバイルデバイスからのアクセス');
-            debugLog('User Agent:', navigator.userAgent);
-        }
-    </script>
+    </div>
 
+    <!-- JavaScript モジュール読み込み -->
+    <script src="js/config.js"></script>
+    <script src="js/sprites.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/weather.js"></script>
+    <script src="js/reputation.js"></script>
+    <script src="js/missions.js"></script>
+    <script src="js/game-state.js"></script>
+    <script src="js/staff.js"></script>
+    <script src="js/simulation.js"></script>
+    <script src="js/comments.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

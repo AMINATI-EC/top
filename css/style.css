@@ -1,0 +1,1094 @@
+/* ====================================
+   style.css - コンビニ経営シミュレーション
+   ==================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+/* ====================================
+   リセット・基本設定
+   ==================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #1a1a2e;
+    min-height: 100dvh;
+    color: #eee;
+    font-size: 14px;
+    overflow-x: hidden;
+}
+
+#game-container {
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: #16213e;
+}
+
+/* ====================================
+   ヘッダー
+   ==================================== */
+
+.header {
+    background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+    padding: 12px 16px;
+    border-bottom: 1px solid #0f3460;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.store-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #e94560;
+}
+
+.day-display {
+    font-size: 13px;
+    color: #aaa;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.day-display span {
+    color: #fff;
+    font-weight: 700;
+}
+
+.dow-badge {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.dow-badge.weekend {
+    color: #f87171;
+    font-weight: 700;
+}
+
+.season-badge {
+    font-size: 10px;
+    background: rgba(74, 222, 128, 0.2);
+    color: #4ade80;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.header-weather {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.weather-icon {
+    font-size: 20px;
+}
+
+.weather-name {
+    font-size: 13px;
+    color: #ddd;
+}
+
+.event-badge {
+    font-size: 11px;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-left: auto;
+    display: none;
+}
+
+.header-reputation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.reputation-label {
+    font-size: 11px;
+    color: #888;
+}
+
+.reputation-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.reputation-fill {
+    height: 100%;
+    background: #facc15;
+    border-radius: 4px;
+    transition: width 0.3s, background 0.3s;
+}
+
+.reputation-icon {
+    font-size: 16px;
+}
+
+.header-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.stat-box {
+    background: rgba(0,0,0,0.3);
+    padding: 10px 8px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 10px;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.stat-value.positive { color: #4ade80; }
+.stat-value.negative { color: #f87171; }
+.stat-value.neutral { color: #60a5fa; }
+
+/* ====================================
+   メインコンテンツ
+   ==================================== */
+
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    padding-bottom: 80px;
+}
+
+/* ====================================
+   タブ
+   ==================================== */
+
+.tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.tab {
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.05);
+    border: none;
+    border-radius: 8px;
+    color: #888;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.tab.active {
+    background: #e94560;
+    color: #fff;
+}
+
+/* ====================================
+   セクション
+   ==================================== */
+
+.section {
+    display: none;
+    animation: fadeIn 0.2s;
+}
+
+.section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #e94560;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(233,69,96,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ====================================
+   商品リスト
+   ==================================== */
+
+.product-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.product-item {
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.product-info h4 {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.product-meta {
+    font-size: 11px;
+    color: #888;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.product-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qty-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: #0f3460;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.qty-btn:active {
+    background: #e94560;
+}
+
+.qty-value {
+    width: 40px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* ====================================
+   バイトリスト
+   ==================================== */
+
+.staff-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.staff-item {
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.staff-item-main {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.staff-sprite {
+    width: 64px;
+    height: 64px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.staff-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.staff-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.staff-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.staff-personality {
+    font-size: 11px;
+    color: #60a5fa;
+    background: rgba(96,165,250,0.2);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.staff-wage {
+    font-size: 12px;
+    color: #f87171;
+}
+
+.staff-skills {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.skill {
+    font-size: 11px;
+    padding: 4px 8px;
+    background: rgba(96,165,250,0.15);
+    border-radius: 4px;
+    color: #a5b4fc;
+}
+
+.shift-toggles {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+}
+
+.shift-toggle {
+    padding: 8px 4px;
+    font-size: 10px;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    color: #666;
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.3;
+    transition: all 0.15s;
+}
+
+.shift-toggle.active {
+    background: rgba(74,222,128,0.2);
+    border-color: #4ade80;
+    color: #4ade80;
+    font-weight: 600;
+}
+
+.add-staff-btn {
+    padding: 6px 12px;
+    font-size: 11px;
+    background: #4ade80;
+    border: none;
+    border-radius: 6px;
+    color: #000;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.no-staff {
+    text-align: center;
+    color: #888;
+    padding: 30px;
+    font-size: 13px;
+}
+
+/* ====================================
+   設備投資
+   ==================================== */
+
+.invest-item {
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.invest-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.invest-name {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.invest-cost {
+    font-size: 13px;
+    color: #f87171;
+    font-weight: 600;
+}
+
+.invest-desc {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.invest-btn {
+    width: 100%;
+    padding: 10px;
+    background: #60a5fa;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.invest-btn:disabled {
+    background: #333;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.invest-btn.purchased {
+    background: #4ade80;
+    color: #000;
+}
+
+/* ====================================
+   情報タブ
+   ==================================== */
+
+.report-section {
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+
+.report-title {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.report-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.report-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 4px 0;
+}
+
+.report-row .label { color: #aaa; }
+.report-row .value { font-weight: 500; }
+.report-row .value.positive { color: #4ade80; }
+.report-row .value.negative { color: #f87171; }
+.report-row .value.warning { color: #fbbf24; }
+.report-row .value.stock-zero { color: #f87171; }
+.report-row .value.stock-low { color: #fbbf24; }
+
+.report-row.total {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 10px;
+    margin-top: 6px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.hint-text {
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* ====================================
+   時間帯別
+   ==================================== */
+
+.time-breakdown {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+}
+
+.time-slot {
+    background: rgba(0,0,0,0.3);
+    padding: 10px 4px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.time-slot-name {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.time-slot-value {
+    font-size: 12px;
+    font-weight: 700;
+    color: #4ade80;
+}
+
+.time-slot-customers {
+    font-size: 10px;
+    color: #888;
+    margin-top: 2px;
+}
+
+.time-slot-staff {
+    font-size: 10px;
+    margin-top: 4px;
+}
+
+/* ====================================
+   フッター
+   ==================================== */
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 16px;
+    background: #0f3460;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    max-width: 430px;
+    margin: 0 auto;
+}
+
+.next-day-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.next-day-btn:active {
+    transform: scale(0.98);
+}
+
+/* ====================================
+   タイトル画面
+   ==================================== */
+
+#title-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    text-align: center;
+}
+
+#title-screen.hidden {
+    display: none;
+}
+
+.title-logo {
+    font-size: 32px;
+    font-weight: 700;
+    color: #e94560;
+    margin-bottom: 8px;
+}
+
+.title-sub {
+    font-size: 12px;
+    color: #888;
+    letter-spacing: 0.2em;
+    margin-bottom: 30px;
+}
+
+.title-desc {
+    font-size: 13px;
+    color: #aaa;
+    line-height: 2;
+    margin-bottom: 30px;
+    max-width: 300px;
+}
+
+.start-btn {
+    padding: 16px 50px;
+    background: #e94560;
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.start-btn:active {
+    background: #c73e54;
+    transform: scale(0.98);
+}
+
+/* ====================================
+   デイリーレポートモーダル
+   ==================================== */
+
+#daily-report {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    padding: 16px;
+}
+
+#daily-report.active {
+    display: flex;
+}
+
+.report-modal {
+    background: #16213e;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.report-modal-header {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.report-modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #e94560;
+}
+
+.report-modal-day {
+    font-size: 13px;
+    color: #888;
+    margin-top: 4px;
+}
+
+.report-modal-btn {
+    width: 100%;
+    padding: 14px;
+    background: #e94560;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 16px;
+}
+
+/* ====================================
+   バイトからのコメント
+   ==================================== */
+
+.staff-comments-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.staff-comments-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #60a5fa;
+    margin-bottom: 12px;
+}
+
+.staff-comment {
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border-left: 3px solid #60a5fa;
+}
+
+.staff-comment.comment-warning {
+    border-left-color: #fbbf24;
+}
+
+.staff-comment.comment-alert {
+    border-left-color: #f87171;
+}
+
+.staff-comment.comment-info {
+    border-left-color: #4ade80;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.comment-sprite {
+    width: 48px;
+    height: 48px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    background: rgba(0,0,0,0.2);
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.comment-staff-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #a5b4fc;
+}
+
+.comment-text {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #ddd;
+}
+
+.no-comments {
+    font-size: 13px;
+    color: #888;
+    text-align: center;
+    padding: 10px;
+}
+
+/* ====================================
+   ゲームオーバー
+   ==================================== */
+
+#game-over {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    text-align: center;
+}
+
+#game-over.active {
+    display: flex;
+}
+
+.gameover-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.gameover-title.win { color: #4ade80; }
+.gameover-title.lose { color: #f87171; }
+
+.gameover-stats {
+    font-size: 14px;
+    color: #aaa;
+    line-height: 2.2;
+    margin-bottom: 30px;
+}
+
+.gameover-stats span {
+    color: #fff;
+    font-weight: 700;
+}
+
+.retry-btn {
+    padding: 14px 40px;
+    background: #e94560;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* ====================================
+   雇用モーダル
+   ==================================== */
+
+#hire-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    padding: 16px;
+}
+
+#hire-modal.active {
+    display: flex;
+}
+
+.hire-modal-content {
+    background: #16213e;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 380px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.hire-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #e94560;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.hire-candidate {
+    background: rgba(255,255,255,0.05);
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+
+.hire-candidate-main {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.hire-sprite {
+    width: 64px;
+    height: 64px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.hire-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.hire-btn {
+    width: 100%;
+    padding: 10px;
+    background: #4ade80;
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.15s;
+}
+
+.hire-btn:disabled {
+    background: #444;
+    color: #888;
+    cursor: not-allowed;
+}
+
+.close-modal-btn {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 8px;
+    color: #aaa;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* ====================================
+   スクロールバー
+   ==================================== */
+
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+}
+
+/* ====================================
+   ミッション
+   ==================================== */
+
+.mission-item {
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border-left: 3px solid #60a5fa;
+}
+
+.mission-item.completed {
+    border-left-color: #4ade80;
+    opacity: 0.8;
+}
+
+.mission-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.mission-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.mission-difficulty {
+    font-size: 12px;
+    color: #fbbf24;
+}
+
+.mission-desc {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 6px;
+}
+
+.mission-progress {
+    font-size: 11px;
+    color: #60a5fa;
+    margin-bottom: 4px;
+}
+
+.mission-reward {
+    font-size: 12px;
+    color: #4ade80;
+    font-weight: 600;
+}
+
+.mission-reward-earned {
+    font-size: 13px;
+    color: #4ade80;
+    font-weight: 700;
+}
+
+.no-missions {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    font-size: 13px;
+}
+
+/* レポート内のミッション達成 */
+.mission-complete {
+    background: rgba(74, 222, 128, 0.1) !important;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+/* レポート内の天候表示 */
+.report-weather {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    padding: 10px !important;
+    margin-bottom: 12px;
+}
+
+.weather-display {
+    font-size: 14px;
+}
+
+.event-display {
+    font-size: 12px;
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.event-display.seasonal {
+    background: rgba(244, 114, 182, 0.2);
+    color: #f472b6;
+}
+
+/* 季節ヒント */
+.season-hint {
+    color: #a78bfa !important;
+    font-weight: 500;
+}
