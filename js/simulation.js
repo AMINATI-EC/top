@@ -73,6 +73,7 @@ const Simulation = {
         const calendarMultiplier = Calendar.getCustomerMultiplier(GameState.day);
         const weatherMultiplier = Weather.getCustomerMultiplier();
         const reputationMultiplier = Reputation.getCustomerMultiplier();
+        const rivalMultiplier = Rival.getCustomerMultiplier();  // 競合店の影響
         
         // 季節イベント
         const seasonalEvent = Calendar.getSeasonalEvent(GameState.day);
@@ -83,7 +84,7 @@ const Simulation = {
         const eventBonus = randomEvent?.customerBonus || 1.0;
         
         // 総合倍率
-        const baseMultiplier = investMultiplier * calendarMultiplier * weatherMultiplier * reputationMultiplier * seasonalBonus * eventBonus;
+        const baseMultiplier = investMultiplier * calendarMultiplier * weatherMultiplier * reputationMultiplier * rivalMultiplier * seasonalBonus * eventBonus;
         
         CONFIG.timeSlots.forEach(slot => {
             // 時間帯別イベントボーナス

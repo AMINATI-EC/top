@@ -1092,3 +1092,235 @@ body {
     color: #a78bfa !important;
     font-weight: 500;
 }
+
+/* ====================================
+   開発タブ
+   ==================================== */
+
+.develop-progress {
+    background: rgba(96, 165, 250, 0.1);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.develop-progress-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.develop-progress-days {
+    font-size: 12px;
+    color: #60a5fa;
+    margin-bottom: 10px;
+}
+
+.develop-progress-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.develop-progress-fill {
+    height: 100%;
+    background: #60a5fa;
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+
+.no-develop {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    font-size: 13px;
+}
+
+.develop-item {
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.develop-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.develop-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.develop-cost {
+    font-size: 12px;
+    color: #f87171;
+}
+
+.develop-desc {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 8px;
+}
+
+.develop-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.develop-btn {
+    width: 100%;
+    padding: 10px;
+    background: #8b5cf6;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.develop-btn:disabled {
+    background: #333;
+    color: #666;
+    cursor: not-allowed;
+}
+
+/* ====================================
+   銀行タブ
+   ==================================== */
+
+.bank-status-box {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.bank-status-box.high {
+    border: 1px solid #f87171;
+}
+
+.bank-debt, .bank-interest {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.repay-btn {
+    width: 100%;
+    padding: 10px;
+    background: #4ade80;
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.bank-plan {
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.plan-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.plan-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.plan-amount {
+    font-size: 14px;
+    color: #4ade80;
+    font-weight: 700;
+}
+
+.plan-desc {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 10px;
+}
+
+.borrow-btn {
+    width: 100%;
+    padding: 10px;
+    background: #f59e0b;
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.borrow-btn:disabled {
+    background: #333;
+    color: #666;
+    cursor: not-allowed;
+}
+
+/* セキュリティ */
+.security-level, .security-loss {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.security-upgrades {
+    margin-top: 10px;
+}
+
+.security-upgrade {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.05);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.upgrade-name {
+    font-size: 13px;
+}
+
+.upgrade-cost {
+    font-size: 12px;
+    color: #f87171;
+}
+
+.upgrade-btn {
+    padding: 6px 12px;
+    background: #60a5fa;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.upgrade-btn:disabled {
+    background: #333;
+    color: #666;
+    cursor: not-allowed;
+}

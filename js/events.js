@@ -62,6 +62,8 @@ const Events = {
         this.bindProductEvents();
         this.bindStaffEvents();
         this.bindInvestEvents();
+        this.bindDevelopEvents();
+        this.bindBankEvents();
     },
     
     bindProductEvents() {
@@ -133,6 +135,69 @@ const Events = {
                     UI.renderAll();
                     this.bindDynamicEvents();
                 }
+            });
+        });
+    },
+    
+    // ====================================
+    // 開発イベント
+    // ====================================
+    
+    bindDevelopEvents() {
+        document.querySelectorAll('.develop-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const productId = btn.dataset.product;
+                const result = Development.startDevelopment(productId);
+                if (result.success) {
+                    UI.renderDevelopment();
+                    UI.renderHeader();
+                }
+                alert(result.message);
+            });
+        });
+    },
+    
+    // ====================================
+    // 銀行イベント
+    // ====================================
+    
+    bindBankEvents() {
+        // 借入ボタン
+        document.querySelectorAll('.borrow-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const planId = btn.dataset.plan;
+                const result = Bank.borrow(planId);
+                if (result.success) {
+                    UI.renderBank();
+                    UI.renderHeader();
+                }
+                alert(result.message);
+            });
+        });
+        
+        // 全額返済ボタン
+        const repayBtn = document.getElementById('repay-all-btn');
+        if (repayBtn) {
+            repayBtn.addEventListener('click', () => {
+                const result = Bank.repayAll();
+                if (result.success) {
+                    UI.renderBank();
+                    UI.renderHeader();
+                }
+                alert(result.message);
+            });
+        }
+        
+        // セキュリティアップグレード
+        document.querySelectorAll('.upgrade-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const upgradeId = btn.dataset.upgrade;
+                const result = Security.purchaseUpgrade(upgradeId);
+                if (result.success) {
+                    UI.renderBank();
+                    UI.renderHeader();
+                }
+                alert(result.message);
             });
         });
     },

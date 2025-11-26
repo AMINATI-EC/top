@@ -98,6 +98,8 @@
                 <button class="tab" data-tab="staff">バイト</button>
                 <button class="tab" data-tab="invest">設備</button>
                 <button class="tab" data-tab="missions">目標</button>
+                <button class="tab" data-tab="develop">開発</button>
+                <button class="tab" data-tab="bank">銀行</button>
                 <button class="tab" data-tab="info">情報</button>
             </div>
             
@@ -130,12 +132,38 @@
                 <div id="completed-missions"></div>
             </div>
             
+            <!-- 開発タブ -->
+            <div class="section" id="tab-develop">
+                <div class="section-title">🔬 新商品開発</div>
+                <div id="develop-status"></div>
+                <div class="section-title" style="margin-top: 20px;">開発可能な商品</div>
+                <div id="develop-list"></div>
+            </div>
+            
+            <!-- 銀行タブ -->
+            <div class="section" id="tab-bank">
+                <div class="section-title">🏦 銀行融資</div>
+                <div id="bank-status"></div>
+                <div class="section-title" style="margin-top: 20px;">融資プラン</div>
+                <div id="bank-plans"></div>
+                <div class="section-title" style="margin-top: 20px;">🔒 セキュリティ</div>
+                <div id="security-status"></div>
+            </div>
+            
             <!-- 情報タブ -->
             <div class="section" id="tab-info">
                 <div class="section-title">経営情報</div>
                 <div class="report-section">
                     <div class="report-title">現在の在庫</div>
                     <div class="report-rows" id="inventory-info"></div>
+                </div>
+                <div class="report-section">
+                    <div class="report-title">競合店</div>
+                    <div class="report-rows" id="rival-info"></div>
+                </div>
+                <div class="report-section">
+                    <div class="report-title">常連客</div>
+                    <div class="report-rows" id="regular-info"></div>
                 </div>
                 <div class="report-section">
                     <div class="report-title">時間帯別の傾向</div>
@@ -162,6 +190,11 @@
     <script src="js/missions.js"></script>
     <script src="js/game-state.js"></script>
     <script src="js/staff.js"></script>
+    <script src="js/rival.js"></script>
+    <script src="js/customers.js"></script>
+    <script src="js/bank.js"></script>
+    <script src="js/security.js"></script>
+    <script src="js/development.js"></script>
     <script src="js/simulation.js"></script>
     <script src="js/comments.js"></script>
     <script src="js/ui.js"></script>

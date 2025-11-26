@@ -28,6 +28,11 @@ const Main = {
         GameState.init();
         Reputation.init();
         Missions.init();
+        Rival.init();
+        Customers.init();
+        Bank.init();
+        Security.init();
+        Development.init();
         
         // 初日の天候生成
         this.todayInfo = Weather.processDay(GameState.day);
@@ -46,8 +51,34 @@ const Main = {
     nextDay() {
         console.log(`${GameState.day}日目終了、シミュレーション実行`);
         
+        // 競合店の動き
+        const rivalEvents = Rival.dailyUpdate();
+        
+        // 競合店出現チェック
+        const newRival = Rival.checkAppearance(GameState.day);
+        
         // シミュレーション実行
         const report = Simulation.runDay();
+        
+        // 常連客処理
+        const customerResult = Customers.processDailyVisits(report);
+        report.customers = customerResult;
+        
+        // 万引き処理
+        const securityResult = Security.processDailyTheft(report);
+        report.security = securityResult;
+        
+        // 銀行利息
+        const interest = Bank.processDailyInterest();
+        report.interest = interest;
+        
+        // 新商品開発進捗
+        const devResult = Development.processDailyProgress();
+        report.development = devResult;
+        
+        // バイトの成長・離職
+        const staffEvents = Staff.processDailyGrowth();
+        report.staffEvents = staffEvents;
         
         // 評判更新
         const reputationResult = Reputation.update(report);
@@ -61,6 +92,13 @@ const Main = {
         if (missionResult.completed.length > 0) {
             report.missionReward = Missions.claimRewards(missionResult.completed);
         }
+        
+        // 競合店情報
+        report.rival = {
+            events: rivalEvents,
+            newRival: newRival,
+            stores: Rival.stores,
+        };
         
         // 今日の情報を保存
         report.weather = Weather.getCurrentWeather();

@@ -14,6 +14,8 @@ const UI = {
         this.renderStaff();
         this.renderInvestments();
         this.renderMissions();
+        this.renderDevelopment();
+        this.renderBank();
         this.renderInfo();
     },
     
@@ -237,6 +239,128 @@ const UI = {
     },
 
     // ====================================
+    // 開発タブ
+    // ====================================
+    
+    renderDevelopment() {
+        const status = Development.getStatus();
+        let statusHtml = '';
+        
+        if (status.inProgress) {
+            statusHtml = `
+                <div class="develop-progress">
+                    <div class="develop-progress-title">🔬 開発中: ${status.inProgress.name}</div>
+                    <div class="develop-progress-days">残り${status.daysRemaining}日</div>
+                    <div class="develop-progress-bar">
+                        <div class="develop-progress-fill" style="width: ${((status.inProgress.developDays - status.daysRemaining) / status.inProgress.developDays) * 100}%"></div>
+                    </div>
+                </div>
+            `;
+        } else {
+            statusHtml = '<div class="no-develop">開発中の商品はありません</div>';
+        }
+        document.getElementById('develop-status').innerHTML = statusHtml;
+        
+        let listHtml = '';
+        if (status.available.length === 0) {
+            listHtml = '<div class="no-develop">開発可能な商品がありません</div>';
+        } else {
+            status.available.forEach(p => {
+                const canDevelop = GameState.cash >= p.developCost && !status.inProgress;
+                listHtml += `
+                    <div class="develop-item">
+                        <div class="develop-header">
+                            <span class="develop-name">${p.icon} ${p.name}</span>
+                            <span class="develop-cost">開発費: ¥${p.developCost.toLocaleString()}</span>
+                        </div>
+                        <div class="develop-desc">${p.description}</div>
+                        <div class="develop-stats">
+                            <span>原価¥${p.cost} → 売価¥${p.price}</span>
+                            <span>成功率: ${Math.floor(p.successRate * 100)}%</span>
+                            <span>開発日数: ${p.developDays}日</span>
+                        </div>
+                        <button class="develop-btn" data-product="${p.id}" ${!canDevelop ? 'disabled' : ''}>
+                            開発開始
+                        </button>
+                    </div>
+                `;
+            });
+        }
+        document.getElementById('develop-list').innerHTML = listHtml;
+    },
+    
+    // ====================================
+    // 銀行タブ
+    // ====================================
+    
+    renderBank() {
+        const bankStatus = Bank.getStatus();
+        let statusHtml = `
+            <div class="bank-status-box ${bankStatus.debtLevel}">
+                <div class="bank-debt">
+                    <span class="label">借入金</span>
+                    <span class="value ${bankStatus.hasDebt ? 'negative' : ''}">¥${bankStatus.debt.toLocaleString()}</span>
+                </div>
+                ${bankStatus.hasDebt ? `
+                <div class="bank-interest">
+                    <span class="label">日利息</span>
+                    <span class="value negative">¥${bankStatus.dailyInterest.toLocaleString()}/日</span>
+                </div>
+                <button class="repay-btn" id="repay-all-btn">全額返済</button>
+                ` : ''}
+            </div>
+        `;
+        document.getElementById('bank-status').innerHTML = statusHtml;
+        
+        let plansHtml = '';
+        Bank.plans.forEach(plan => {
+            const canBorrow = Bank.getMaxBorrowable() >= plan.amount;
+            plansHtml += `
+                <div class="bank-plan">
+                    <div class="plan-header">
+                        <span class="plan-name">${plan.name}</span>
+                        <span class="plan-amount">¥${plan.amount.toLocaleString()}</span>
+                    </div>
+                    <div class="plan-desc">${plan.description}</div>
+                    <button class="borrow-btn" data-plan="${plan.id}" ${!canBorrow ? 'disabled' : ''}>
+                        借りる
+                    </button>
+                </div>
+            `;
+        });
+        document.getElementById('bank-plans').innerHTML = plansHtml;
+        
+        // セキュリティ
+        const secStatus = Security.getStatus();
+        let secHtml = `
+            <div class="security-level">
+                <span class="label">セキュリティLv</span>
+                <span class="value">${secStatus.level}/${secStatus.maxLevel}</span>
+            </div>
+            <div class="security-loss">
+                <span class="label">累計被害額</span>
+                <span class="value negative">¥${secStatus.totalLoss.toLocaleString()}</span>
+            </div>
+        `;
+        
+        if (secStatus.availableUpgrades.length > 0) {
+            secHtml += '<div class="security-upgrades">';
+            secStatus.availableUpgrades.forEach(u => {
+                const canBuy = GameState.cash >= u.cost;
+                secHtml += `
+                    <div class="security-upgrade">
+                        <span class="upgrade-name">${u.name}</span>
+                        <span class="upgrade-cost">¥${u.cost.toLocaleString()}</span>
+                        <button class="upgrade-btn" data-upgrade="${u.id}" ${!canBuy ? 'disabled' : ''}>導入</button>
+                    </div>
+                `;
+            });
+            secHtml += '</div>';
+        }
+        document.getElementById('security-status').innerHTML = secHtml;
+    },
+
+    // ====================================
     // 情報タブ
     // ====================================
     
@@ -254,6 +378,37 @@ const UI = {
             `;
         });
         document.getElementById('inventory-info').innerHTML = invHtml;
+        
+        // 競合店情報
+        let rivalHtml = '';
+        if (Rival.stores.length === 0) {
+            rivalHtml = '<div class="report-row"><span class="label hint-text">まだ競合店はありません</span></div>';
+        } else {
+            Rival.stores.forEach(r => {
+                const threat = Math.floor(r.customerSteal * r.power * 100);
+                rivalHtml += `
+                    <div class="report-row">
+                        <span class="label">${r.icon} ${r.name}</span>
+                        <span class="value warning">客-${threat}%</span>
+                    </div>
+                `;
+            });
+        }
+        document.getElementById('rival-info').innerHTML = rivalHtml;
+        
+        // 常連客情報
+        const regularSummary = Customers.getRegularsSummary();
+        let regularHtml = `
+            <div class="report-row">
+                <span class="label">常連客数</span>
+                <span class="value">${regularSummary.total}人</span>
+            </div>
+            <div class="report-row">
+                <span class="label">予想安定収入</span>
+                <span class="value positive">¥${regularSummary.expectedIncome.toLocaleString()}/日</span>
+            </div>
+        `;
+        document.getElementById('regular-info').innerHTML = regularHtml;
         
         // 需要傾向（季節考慮）
         const season = Calendar.getSeasonName(GameState.day);

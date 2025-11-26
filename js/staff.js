@@ -170,3 +170,117 @@ const Staff = {
         return working[Math.floor(Math.random() * working.length)];
     },
 };
+
+    // ====================================
+    // 成長・離職システム
+    // ====================================
+    
+    processDailyGrowth() {
+        const events = [];
+        
+        GameState.staff.forEach(staff => {
+            // 今日働いたかチェック
+            const workedToday = Object.values(staff.shifts).some(s => s);
+            
+            if (workedToday) {
+                staff.daysWorked++;
+                staff.experience++;
+                
+                // スキル成長（10日ごとにチャンス）
+                if (staff.daysWorked % 10 === 0) {
+                    const grewSkill = this.trySkillUp(staff);
+                    if (grewSkill) {
+                        events.push({
+                            type: 'skill_up',
+                            staff: staff,
+                            skill: grewSkill,
+                            message: `${staff.name}の${grewSkill}スキルが上がった！`,
+                        });
+                    }
+                }
+                
+                // モチベーション変動
+                const shiftCount = Object.values(staff.shifts).filter(s => s).length;
+                if (shiftCount >= 4) {
+                    staff.motivation = Math.max(0, staff.motivation - 5);
+                } else if (shiftCount <= 2) {
+                    staff.motivation = Math.min(100, staff.motivation + 2);
+                }
+            }
+        });
+        
+        // 離職チェック
+        const quitters = this.checkQuit();
+        quitters.forEach(staff => {
+            events.push({
+                type: 'quit',
+                staff: staff,
+                message: `${staff.name}が辞めてしまった...`,
+            });
+        });
+        
+        return events;
+    },
+    
+    trySkillUp(staff) {
+        const skills = ['register', 'stock', 'clean'];
+        const skill = skills[Math.floor(Math.random() * skills.length)];
+        
+        if (staff.skills[skill] < 5) {
+            staff.skills[skill]++;
+            const skillNames = { register: 'レジ', stock: '品出し', clean: '清掃' };
+            return skillNames[skill];
+        }
+        return null;
+    },
+    
+    checkQuit() {
+        const quitters = [];
+        
+        GameState.staff = GameState.staff.filter(staff => {
+            const quitChance = this.calculateQuitChance(staff);
+            
+            if (Math.random() < quitChance) {
+                quitters.push(staff);
+                return false;
+            }
+            return true;
+        });
+        
+        return quitters;
+    },
+    
+    calculateQuitChance(staff) {
+        let chance = 0;
+        
+        if (staff.motivation < 30) {
+            chance += 0.1;
+        } else if (staff.motivation < 50) {
+            chance += 0.03;
+        }
+        
+        if (staff.daysWorked > 20) {
+            chance *= 0.5;
+        }
+        
+        if (staff.personality.id === 'serious') {
+            chance *= 0.7;
+        }
+        
+        return Math.min(0.15, chance);
+    },
+    
+    giveBonus(staffId, amount = 5000) {
+        const staff = GameState.staff.find(s => s.id === staffId);
+        if (!staff) return { success: false, message: 'スタッフが見つかりません' };
+        if (GameState.cash < amount) return { success: false, message: '資金不足です' };
+        
+        GameState.cash -= amount;
+        staff.motivation = Math.min(100, staff.motivation + 20);
+        
+        return {
+            success: true,
+            message: `${staff.name}にボーナスを支給！モチベーションが上がった`,
+        };
+    },
+};
