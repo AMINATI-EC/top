@@ -169,8 +169,7 @@ const Staff = {
         if (working.length === 0) return null;
         return working[Math.floor(Math.random() * working.length)];
     },
-};
-
+    
     // ====================================
     // 成長・離職システム
     // ====================================
