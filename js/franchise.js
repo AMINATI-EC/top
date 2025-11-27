@@ -124,12 +124,12 @@ const Franchise = {
         
         // 売上ノルマ
         const salesTarget = this.quotas[0].baseTarget * Math.pow(this.quotas[0].scaling, GameState.day - 1);
-        const salesPassed = report.sales >= salesTarget;
+        const salesPassed = report.totalSales >= salesTarget;
         
         results.push({
             ...this.quotas[0],
             target: salesTarget,
-            actual: report.sales,
+            actual: report.totalSales,
             passed: salesPassed,
         });
         

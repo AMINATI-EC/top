@@ -93,7 +93,7 @@ const Main = {
         report.rent = rent;
         
         // ロイヤリティ支払い
-        const royalty = Franchise.getDailyRoyalty(report.sales);
+        const royalty = Franchise.getDailyRoyalty(report.totalSales);
         Franchise.payRoyalty(royalty);
         report.royalty = royalty;
         
@@ -162,6 +162,9 @@ const Main = {
         report.weather = Weather.getCurrentWeather();
         report.event = Weather.todayEvent;
         report.calendar = Calendar.getDateDisplay(GameState.day);
+        
+        // 統計更新（yesterdaySales, yesterdayProfitを更新）
+        GameState.updateStats(report);
         
         // レポート表示
         UI.showReport(report);

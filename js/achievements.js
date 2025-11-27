@@ -24,7 +24,7 @@ const Achievements = {
             icon: '📈',
             description: '1日の売上が1万円を超えた',
             reward: 2000,
-            condition: (report) => report && report.sales >= 10000,
+            condition: (report) => report && report.totalSales >= 10000,
             category: 'basic',
         },
         {
@@ -33,7 +33,7 @@ const Achievements = {
             icon: '📊',
             description: '1日の売上が5万円を超えた',
             reward: 10000,
-            condition: (report) => report && report.sales >= 50000,
+            condition: (report) => report && report.totalSales >= 50000,
             category: 'basic',
         },
         {
@@ -42,7 +42,7 @@ const Achievements = {
             icon: '🏆',
             description: '1日の売上が10万円を超えた',
             reward: 30000,
-            condition: (report) => report && report.sales >= 100000,
+            condition: (report) => report && report.totalSales >= 100000,
             category: 'basic',
         },
         
